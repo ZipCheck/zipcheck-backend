@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.zipcheck.boards.mapper.BoardMapper">
+
+    <resultMap id="boardResultMap" type="com.ssafy.zipcheck.boards.domain.Board">
+        <id property="boardId" column="board_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="hit" column="hit"/>
+        <result property="created" column="created"/>
+        <result property="updated" column="updated"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.ssafy.zipcheck.boards.domain.Board" useGeneratedKeys="true" keyProperty="boardId">
+        INSERT INTO boards (title, content, created, updated)
+        VALUES (#{title}, #{content}, NOW(), NOW())
+    </insert>
+
+    <select id="findAll" resultMap="boardResultMap">
+        SELECT board_id, title, content, hit, created, updated
+        FROM boards
+        ORDER BY created DESC
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="boardResultMap">
+        SELECT board_id, title, content, hit, created, updated
+        FROM boards
+        WHERE board_id = #{boardId}
+    </select>
+
+    <update id="update" parameterType="com.ssafy.zipcheck.boards.domain.Board">
+        UPDATE boards
+        SET title = #{title}, content = #{content}, updated = NOW()
+        WHERE board_id = #{boardId}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM boards
+        WHERE board_id = #{boardId}
+    </delete>
+
+    <update id="incrementHit" parameterType="long">
+        UPDATE boards
+        SET hit = hit + 1
+        WHERE board_id = #{boardId}
+    </update>
+
+</mapper>
