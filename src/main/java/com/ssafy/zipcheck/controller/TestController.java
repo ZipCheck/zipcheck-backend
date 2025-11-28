@@ -1,4 +1,4 @@
-package controller;
+package com.ssafy.zipcheck.controller;
 
 import org.springframework.stereotype.Controller;
 
