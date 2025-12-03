@@ -15,4 +15,5 @@ public interface BoardMapper {
     void update(Boards board);
     void delete(int boardId);
     void incrementHit(int boardId);
+    void incrementLike(int boardId);
 }
