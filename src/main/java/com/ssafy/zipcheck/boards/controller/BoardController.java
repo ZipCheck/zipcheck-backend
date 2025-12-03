@@ -7,12 +7,14 @@ import com.ssafy.zipcheck.boards.dto.BoardUpdateDto;
 import com.ssafy.zipcheck.boards.service.BoardService;
 import com.ssafy.zipcheck.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/zipcheck/boards")
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class BoardController {
 
     @PutMapping("/{boardId}")
     public ResponseEntity<ApiResponse<Void>> updateBoard(@PathVariable int boardId, @RequestBody BoardUpdateDto updateDto) {
+        log.debug("update called");
         boardService.updateBoard(boardId, updateDto);
         return ResponseEntity.ok(ApiResponse.ok());
     }
