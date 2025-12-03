@@ -1,16 +1,10 @@
 package com.ssafy.zipcheck.boards.vo;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Boards {
-
     private int boardId;            // PK
     private String title;           // 제목
     private String content;         // 내용

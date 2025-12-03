@@ -7,12 +7,14 @@ import com.ssafy.zipcheck.boards.dto.BoardUpdateDto;
 import com.ssafy.zipcheck.boards.mapper.BoardMapper;
 import com.ssafy.zipcheck.boards.vo.Boards;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
@@ -37,7 +39,6 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardDetailDto getBoardById(int boardId) {
-        boardMapper.incrementHit(boardId);
         Boards board = boardMapper.findById(boardId).orElse(null); // Or throw a custom not found exception
         if (board == null) {
             return null;
