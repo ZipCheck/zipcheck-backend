@@ -63,4 +63,9 @@ public class UserServiceImpl implements UserService {
         userMapper.saveRefreshToken(email, token);
     }
 
+    @Override
+    public String findRefreshToken(String email) {
+        return userMapper.findRefreshToken(email);
+    }
+
 }
