@@ -11,5 +11,6 @@ public interface UserService {
     User login(String email, String rawPassword);
     void saveRefreshToken(String email, String token);
     String findRefreshToken(String email);
+    void logout(String email);
 
 }

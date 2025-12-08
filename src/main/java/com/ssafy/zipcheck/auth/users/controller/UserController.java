@@ -1,5 +1,6 @@
 package com.ssafy.zipcheck.auth.users.controller;
 
+import com.ssafy.zipcheck.auth.security.domain.CustomUserDetails;
 import com.ssafy.zipcheck.auth.security.jwt.JwtUtil;
 import com.ssafy.zipcheck.auth.users.dto.LoginRequest;
 import com.ssafy.zipcheck.auth.users.dto.SignupRequest;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -139,6 +142,32 @@ public class UserController {
 
         } catch (Exception e) {
             return ApiResponse.internalError("토큰 재발급 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) {
+
+        try {
+            // JWT Filter에서 인증된 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            String email = userDetails.getUsername();
+
+            // 1) DB의 refresh token 삭제
+            userService.logout(email);
+
+            // 2) refresh 쿠키 무효화
+            Cookie cookie = new Cookie("refresh", null);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(0); // 즉시 삭제
+            response.addCookie(cookie);
+
+            return ApiResponse.ok("로그아웃 완료");
+
+        } catch (Exception e) {
+            return ApiResponse.internalError("로그아웃 중 오류가 발생했습니다.");
         }
     }
 

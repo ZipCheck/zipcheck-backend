@@ -26,4 +26,6 @@ public interface UserMapper {
 
     String findRefreshToken(String email);
 
+    void deleteRefreshToken(String email);
+
 }
