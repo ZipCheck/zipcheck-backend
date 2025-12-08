@@ -10,5 +10,6 @@ public interface UserService {
     void updatePassword(UpdatePasswordRequest request);
     User login(String email, String rawPassword);
     void saveRefreshToken(String email, String token);
+    String findRefreshToken(String email);
 
 }

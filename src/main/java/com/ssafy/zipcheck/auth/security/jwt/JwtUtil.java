@@ -36,12 +36,12 @@ public class JwtUtil {
                 .get("role", String.class);
     }
 
-    public Boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration()
-                .before(new Date());
+    public void validateToken(String token) {
+        Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
+        // parseSignedClaims 내부에서 만료 시 ExpiredJwtException throw
     }
 
     public String createAccessToken(String username, String role) {

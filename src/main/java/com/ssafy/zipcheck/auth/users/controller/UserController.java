@@ -7,7 +7,9 @@ import com.ssafy.zipcheck.auth.users.dto.UpdatePasswordRequest;
 import com.ssafy.zipcheck.auth.users.service.UserService;
 import com.ssafy.zipcheck.auth.users.vo.User;
 import com.ssafy.zipcheck.common.response.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +71,74 @@ public class UserController {
         } catch (Exception e) {
             log.info("로그인 중 에러: {}", e.getMessage());
             return ApiResponse.internalError("로그인 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/reissue")
+    public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+
+        try {
+            // 1) 쿠키에서 refresh token 가져오기
+            Cookie[] cookies = request.getCookies();
+            if (cookies == null) {
+                return ApiResponse.badRequest("리프레시 토큰이 없습니다.");
+            }
+
+            String refresh = null;
+            for (Cookie c : cookies) {
+                if (c.getName().equals("refresh")) {
+                    refresh = c.getValue();
+                }
+            }
+
+            if (refresh == null) {
+                return ApiResponse.badRequest("리프레시 토큰이 없습니다.");
+            }
+
+            // 2) 리프레시 토큰 만료 체크
+            try {
+                jwtUtil.validateToken(refresh);
+            } catch (ExpiredJwtException e) {
+                return ApiResponse.badRequest("리프레시 토큰이 만료되었습니다. 다시 로그인하세요.");
+            }
+
+            // 3) category 확인 (refresh 토큰인지)
+            String category = jwtUtil.getCategory(refresh);
+            if (!category.equals("refresh")) {
+                return ApiResponse.badRequest("올바른 리프레시 토큰이 아닙니다.");
+            }
+
+            // 4) 토큰에서 email, role 추출
+            String email = jwtUtil.getUsername(refresh);
+            String role = jwtUtil.getRole(refresh);
+
+            // 5) DB의 refresh token과 비교
+            String saved = userService.findRefreshToken(email);
+
+            if (!saved.equals(refresh)) {
+                return ApiResponse.badRequest("리프레시 토큰이 유효하지 않습니다.");
+            }
+
+            // 6) 새 토큰 발급
+            String newAccess = jwtUtil.createAccessToken(email, role);
+            String newRefresh = jwtUtil.createRefreshToken(email, role);
+
+            // 7) DB의 refresh 토큰 갱신
+            userService.saveRefreshToken(email, newRefresh);
+
+            // 8) HttpOnly 쿠키로 재저장
+            Cookie cookie = new Cookie("refresh", newRefresh);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
+            // 9) access token 헤더로 전달
+            response.setHeader("Authorization", "Bearer " + newAccess);
+
+            return ApiResponse.ok("토큰 재발급 완료");
+
+        } catch (Exception e) {
+            return ApiResponse.internalError("토큰 재발급 중 오류가 발생했습니다.");
         }
     }
 
