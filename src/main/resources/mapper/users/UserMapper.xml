@@ -23,14 +23,14 @@
             nickname,
             profile_image,
             status,
-            admin
+            role
         ) VALUES (
-                     #{email},
-                     #{password},
-                     #{nickname},
-                     #{profileImage},
+                     #{dto.email},
+                     #{dto.password},
+                     #{dto.nickname},
+                     #{dto.profileImage},
                      1,
-                     0
+                     #{role}
                  )
     </insert>
 
@@ -49,11 +49,18 @@
         WHERE email = #{email}
     </select>
 
-    <!-- ID로 User 조회 -->
-    <select id="findById" resultType="com.ssafy.zipcheck.auth.users.vo.User">
-        SELECT *
-        FROM users
-        WHERE user_id = #{userId}
+    <!-- Refresh Token 저장 (insert or update) -->
+    <insert id="saveRefreshToken">
+        INSERT INTO refresh_token (email, token)
+        VALUES (#{email}, #{token})
+            ON DUPLICATE KEY UPDATE token = #{token}
+    </insert>
+
+    <!-- Refresh Token 조회 -->
+    <select id="findRefreshToken" resultType="string">
+        SELECT token
+        FROM refresh_token
+        WHERE email = #{email}
     </select>
 
 </mapper>
