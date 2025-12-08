@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.zipcheck.auth.users.mapper.UserMapper">
+<mapper namespace="com.ssafy.zipcheck.auth.mapper.AuthMapper">
 
     <!-- 이메일 중복 확인 -->
     <select id="existsByEmail" resultType="int">
@@ -25,31 +25,23 @@
             status,
             role
         ) VALUES (
-                     #{dto.email},
-                     #{dto.password},
-                     #{dto.nickname},
-                     #{dto.profileImage},
+                     #{email},
+                     #{password},
+                     #{nickname},
+                     #{profileImage},
                      1,
                      #{role}
                  )
     </insert>
 
-    <!-- 비밀번호 업데이트 -->
-    <update id="updatePassword">
-        UPDATE users
-        SET password = #{newPassword},
-            updated_at = NOW()
-        WHERE user_id = #{userId}
-    </update>
-
     <!-- 이메일로 User 조회 -->
-    <select id="findByEmail" resultType="com.ssafy.zipcheck.auth.users.vo.User">
+    <select id="findByEmail" resultType="com.ssafy.zipcheck.users.vo.User">
         SELECT *
         FROM users
         WHERE email = #{email}
     </select>
 
-    <!-- Refresh Token 저장 (insert or update) -->
+    <!-- Refresh Token 저장 (INSERT or UPDATE) -->
     <insert id="saveRefreshToken">
         INSERT INTO refresh_token (email, token)
         VALUES (#{email}, #{token})
@@ -63,6 +55,7 @@
         WHERE email = #{email}
     </select>
 
+    <!-- Refresh Token 삭제 -->
     <delete id="deleteRefreshToken">
         DELETE FROM refresh_token WHERE email = #{email}
     </delete>

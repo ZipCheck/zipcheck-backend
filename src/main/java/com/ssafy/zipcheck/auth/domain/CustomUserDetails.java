@@ -1,6 +1,6 @@
-package com.ssafy.zipcheck.auth.security.domain;
+package com.ssafy.zipcheck.auth.domain;
 
-import com.ssafy.zipcheck.auth.users.vo.User;
+import com.ssafy.zipcheck.users.vo.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

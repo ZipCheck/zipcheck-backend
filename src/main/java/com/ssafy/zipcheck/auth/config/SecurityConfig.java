@@ -1,8 +1,8 @@
-package com.ssafy.zipcheck.auth.security.config;
+package com.ssafy.zipcheck.auth.config;
 
-import com.ssafy.zipcheck.auth.security.jwt.JwtFilter;
-import com.ssafy.zipcheck.auth.security.jwt.JwtProperties;
-import com.ssafy.zipcheck.auth.security.jwt.JwtUtil;
+import com.ssafy.zipcheck.auth.jwt.JwtFilter;
+import com.ssafy.zipcheck.auth.jwt.JwtProperties;
+import com.ssafy.zipcheck.auth.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

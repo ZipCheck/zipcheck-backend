@@ -1,4 +1,4 @@
-package com.ssafy.zipcheck.auth.users.dto;
+package com.ssafy.zipcheck.auth.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,27 +1,26 @@
-package com.ssafy.zipcheck.auth.users.service;
+package com.ssafy.zipcheck.auth.service;
 
-import com.ssafy.zipcheck.auth.users.dto.SignupRequest;
-import com.ssafy.zipcheck.auth.users.dto.UpdatePasswordRequest;
-import com.ssafy.zipcheck.auth.users.mapper.UserMapper;
-import com.ssafy.zipcheck.auth.users.vo.User;
+import com.ssafy.zipcheck.auth.dto.SignupRequest;
+import com.ssafy.zipcheck.auth.mapper.AuthMapper;
+import com.ssafy.zipcheck.users.vo.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class AuthServiceImpl implements AuthService {
 
-    private final UserMapper userMapper;
+    private final AuthMapper authMapper;
     private final BCryptPasswordEncoder encoder;
 
     @Override
     public void signup(SignupRequest request) {
 
-        if (userMapper.existsByEmail(request.getEmail()) > 0)
+        if (authMapper.existsByEmail(request.getEmail()) > 0)
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
 
-        if (userMapper.existsByNickname(request.getNickname()) > 0)
+        if (authMapper.existsByNickname(request.getNickname()) > 0)
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
 
         request.setPassword(encoder.encode(request.getPassword()));
@@ -29,22 +28,12 @@ public class UserServiceImpl implements UserService {
         // 기본 역할 설정
         String role = "ROLE_USER";
 
-        userMapper.insertUser(request, role);
-    }
-
-    @Override
-    public void updatePassword(UpdatePasswordRequest request) {
-        request.setNewPassword(encoder.encode(request.getNewPassword()));
-
-        int updated = userMapper.updatePassword(request);
-
-        if (updated == 0)
-            throw new IllegalArgumentException("비밀번호 변경 실패");
+        authMapper.insertUser(request, role);
     }
 
     @Override
     public User login(String email, String rawPassword) {
-        User user = userMapper.findByEmail(email)
+        User user = authMapper.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
         if (!encoder.matches(rawPassword, user.getPassword())) {
@@ -60,17 +49,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveRefreshToken(String email, String token) {
-        userMapper.saveRefreshToken(email, token);
+        authMapper.saveRefreshToken(email, token);
     }
 
     @Override
     public String findRefreshToken(String email) {
-        return userMapper.findRefreshToken(email);
+        return authMapper.findRefreshToken(email);
     }
 
     @Override
     public void logout(String email) {
-        userMapper.deleteRefreshToken(email);
+        authMapper.deleteRefreshToken(email);
     }
 
 }

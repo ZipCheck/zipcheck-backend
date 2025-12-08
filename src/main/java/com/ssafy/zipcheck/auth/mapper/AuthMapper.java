@@ -1,15 +1,15 @@
-package com.ssafy.zipcheck.auth.users.mapper;
+package com.ssafy.zipcheck.auth.mapper;
 
-import com.ssafy.zipcheck.auth.users.dto.SignupRequest;
-import com.ssafy.zipcheck.auth.users.dto.UpdatePasswordRequest;
-import com.ssafy.zipcheck.auth.users.vo.User;
+import com.ssafy.zipcheck.auth.dto.SignupRequest;
+import com.ssafy.zipcheck.users.dto.UpdatePasswordRequest;
+import com.ssafy.zipcheck.users.vo.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Optional;
 
 @Mapper
-public interface UserMapper {
+public interface AuthMapper {
 
     int existsByEmail(String email);
 

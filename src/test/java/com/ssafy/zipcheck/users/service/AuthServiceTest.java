@@ -1,8 +1,8 @@
 package com.ssafy.zipcheck.users.service;
 
-import com.ssafy.zipcheck.auth.users.dto.SignupRequest;
-import com.ssafy.zipcheck.auth.users.mapper.UserMapper;
-import com.ssafy.zipcheck.auth.users.service.UserServiceImpl;
+import com.ssafy.zipcheck.auth.dto.SignupRequest;
+import com.ssafy.zipcheck.auth.mapper.AuthMapper;
+import com.ssafy.zipcheck.auth.service.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,13 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class UserServiceTest {
+class AuthServiceTest {
 
     @Autowired
-    private UserServiceImpl userService;
+    private AuthServiceImpl userService;
 
     @Autowired
-    private UserMapper userMapper;
+    private AuthMapper authMapper;
 
     @Test
     void 회원가입_성공() {
@@ -31,7 +31,7 @@ class UserServiceTest {
         userService.signup(req);
 
         // then
-        int exists = userMapper.existsByEmail("test123@test.com");
+        int exists = authMapper.existsByEmail("test123@test.com");
         assertThat(exists).isEqualTo(1);
     }
 }
