@@ -68,4 +68,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.findRefreshToken(email);
     }
 
+    @Override
+    public void logout(String email) {
+        userMapper.deleteRefreshToken(email);
+    }
+
 }

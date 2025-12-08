@@ -63,4 +63,8 @@
         WHERE email = #{email}
     </select>
 
+    <delete id="deleteRefreshToken">
+        DELETE FROM refresh_token WHERE email = #{email}
+    </delete>
+
 </mapper>
