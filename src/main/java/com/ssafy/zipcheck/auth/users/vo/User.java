@@ -12,7 +12,7 @@ public class User {
     private String nickname;
     private String profileImage;
     private Integer status;
-    private Boolean admin;
+    private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt; // 비밀번호 변경 일자
 }
