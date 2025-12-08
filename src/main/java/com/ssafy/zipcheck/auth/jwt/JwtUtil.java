@@ -1,4 +1,4 @@
-package com.ssafy.zipcheck.auth.security.jwt;
+package com.ssafy.zipcheck.auth.jwt;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Component;

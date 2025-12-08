@@ -1,4 +1,4 @@
-package com.ssafy.zipcheck.auth.security.jwt;
+package com.ssafy.zipcheck.auth.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

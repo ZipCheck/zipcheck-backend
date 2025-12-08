@@ -1,4 +1,4 @@
-package com.ssafy.zipcheck.auth.users.vo;
+package com.ssafy.zipcheck.auth.vo;
 
 import lombok.Data;
 

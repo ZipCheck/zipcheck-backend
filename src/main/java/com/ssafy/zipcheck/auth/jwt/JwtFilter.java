@@ -1,7 +1,7 @@
-package com.ssafy.zipcheck.auth.security.jwt;
+package com.ssafy.zipcheck.auth.jwt;
 
-import com.ssafy.zipcheck.auth.security.domain.CustomUserDetails;
-import com.ssafy.zipcheck.auth.users.vo.User;
+import com.ssafy.zipcheck.auth.domain.CustomUserDetails;
+import com.ssafy.zipcheck.users.vo.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
