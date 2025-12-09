@@ -20,6 +20,11 @@ public class MapServiceImpl implements MapService {
     }
 
     @Override
+    public MapDealResponse getDealById(long id) {
+        return mapMapper.getDealById(id);
+    }
+
+    @Override
     public List<String> getSidoNames() {
         return mapMapper.getSidoNames();
     }

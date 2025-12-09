@@ -9,6 +9,7 @@ import java.util.List;
 @Mapper
 public interface MapMapper {
     List<MapDealResponse> searchHouseDeals(MapSearchRequest request);
+    MapDealResponse getDealById(long id);
     List<String> getSidoNames();
     List<String> getGugunNames(String sidoName);
     List<String> getDongNames(String sidoName, String gugunName);
