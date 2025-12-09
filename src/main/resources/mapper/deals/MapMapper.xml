@@ -39,12 +39,12 @@
             hi.build_year,
             hi.latitude,
             hi.longitude
-        FROM
-            housedeals hd
-        JOIN
-            houseinfos hi ON hd.apt_seq = hi.apt_seq
-        JOIN
-            dongcodes dc ON LEFT(dc.dong_code, 5) = hi.sgg_cd AND dc.dong_name = hi.umd_nm
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
         <where>
             <if test="sidoName != null and !sidoName.isEmpty()">
                 AND dc.sido_name = #{sidoName}
@@ -56,7 +56,7 @@
                 AND dc.dong_name = #{dongName}
             </if>
             <if test="aptName != null and !aptName.isEmpty()">
-                AND hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
+                AND hi.apt_nm LIKE CONCAT(#{aptName}, '%')
             </if>
             <if test="minArea != null">
                 AND hd.exclu_use_ar &gt;= #{minArea}
@@ -65,23 +65,13 @@
                 AND hd.exclu_use_ar &lt;= #{maxArea}
             </if>
             <if test="minPrice != null">
-                AND CAST(REPLACE(hd.deal_amount, ',', '') AS UNSIGNED) &gt;= #{minPrice}
+                AND hd.deal_amount_num &gt;= #{minPrice}
             </if>
             <if test="maxPrice != null">
-                AND CAST(REPLACE(hd.deal_amount, ',', '') AS UNSIGNED) &lt;= #{maxPrice}
+                AND hd.deal_amount_num &lt;= #{maxPrice}
             </if>
         </where>
-        <choose>
-            <when test="sortBy == 'areaAsc'">
-                ORDER BY hd.exclu_use_ar ASC
-            </when>
-            <when test="sortBy == 'areaDesc'">
-                ORDER BY hd.exclu_use_ar DESC
-            </when>
-            <otherwise>
-                ORDER BY hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
-            </otherwise>
-        </choose>
+        ORDER BY hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 

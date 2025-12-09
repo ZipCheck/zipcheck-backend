@@ -12,7 +12,6 @@ public class MapSearchRequest {
     private Double maxArea;
     private Long minPrice;
     private Long maxPrice;
-    private String sortBy; // e.g., "areaAsc", "areaDesc"
 
     // Pagination
     private int page = 1;  // 기본 페이지 번호
