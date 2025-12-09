@@ -1,6 +1,7 @@
 package com.ssafy.zipcheck.auth.controller;
 
 import com.ssafy.zipcheck.auth.domain.CustomUserDetails;
+import com.ssafy.zipcheck.auth.dto.LoginResponse;
 import com.ssafy.zipcheck.auth.jwt.JwtUtil;
 import com.ssafy.zipcheck.auth.dto.LoginRequest;
 import com.ssafy.zipcheck.auth.dto.SignupRequest;
@@ -66,7 +67,16 @@ public class AuthController {
             // Header로 AccessToken 전달
             response.setHeader("Authorization", "Bearer " + access);
 
-            return ApiResponse.ok("로그인 성공");
+            // 프론트에 보낼 유저 정보 + access token
+            LoginResponse loginResponse = new LoginResponse(
+                    user.getUserId(),
+                    user.getEmail(),
+                    user.getNickname(),
+                    user.getRole(),
+                    access
+            );
+
+            return ApiResponse.ok(loginResponse);
 
         } catch (IllegalArgumentException e) {
             return ApiResponse.badRequest(e.getMessage());
