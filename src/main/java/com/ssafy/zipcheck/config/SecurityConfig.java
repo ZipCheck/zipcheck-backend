@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // '/api/deals/**' 경로에 대한 GET 요청은 모두 허용
                         .requestMatchers(HttpMethod.GET, "/zipcheck/map/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/zipcheck/map/search").permitAll()
                         // 다른 모든 요청은 인증 필요
                         .anyRequest().authenticated());
 

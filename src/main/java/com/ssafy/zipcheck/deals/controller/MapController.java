@@ -16,8 +16,8 @@ public class MapController {
 
     private final MapService mapService;
 
-    @GetMapping
-    public ResponseEntity<List<MapDealResponse>> searchHouseDeals(@ModelAttribute MapSearchRequest request) {
+    @PostMapping("/search")
+    public ResponseEntity<List<MapDealResponse>> searchHouseDeals(@RequestBody MapSearchRequest request) {
         List<MapDealResponse> deals = mapService.searchHouseDeals(request);
         return ResponseEntity.ok(deals);
     }
