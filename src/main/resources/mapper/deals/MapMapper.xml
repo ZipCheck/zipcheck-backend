@@ -87,4 +87,29 @@
         SELECT DISTINCT dong_name FROM dongcodes WHERE sido_name = #{sidoName} AND gugun_name = #{gugunName} AND dong_name IS NOT NULL
     </select>
 
+    <select id="getDealById" parameterType="long" resultMap="houseDealResponseMap">
+        SELECT
+            hd.no,
+            hi.apt_seq,
+            hd.apt_dong,
+            hd.floor,
+            hd.deal_year,
+            hd.deal_month,
+            hd.deal_day,
+            hd.exclu_use_ar,
+            hd.deal_amount,
+            hi.apt_nm,
+            hi.jibun,
+            hi.road_nm,
+            hi.build_year,
+            hi.latitude,
+            hi.longitude
+        FROM
+            housedeals hd
+        JOIN
+            houseinfos hi ON hd.apt_seq = hi.apt_seq
+        WHERE
+            hd.no = #{id}
+    </select>
+
 </mapper>

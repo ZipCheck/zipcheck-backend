@@ -39,4 +39,10 @@ public class MapController {
         List<String> dongNames = mapService.getDongNames(sido, gugun);
         return ResponseEntity.ok(dongNames);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MapDealResponse> getDealById(@PathVariable long id) {
+        MapDealResponse deal = mapService.getDealById(id);
+        return ResponseEntity.ok(deal);
+    }
 }
