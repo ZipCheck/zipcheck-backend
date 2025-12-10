@@ -186,6 +186,7 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return ApiResponse.badRequest(e.getMessage());
         } catch (Exception e) {
+            log.info("Exception: {}", e.getMessage());
             return ApiResponse.internalError("비밀번호 초기화 요청 중 오류 발생");
         }
     }
