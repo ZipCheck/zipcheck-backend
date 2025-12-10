@@ -6,7 +6,6 @@ import com.ssafy.zipcheck.comments.vo.Comments;
 import com.ssafy.zipcheck.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,19 +24,27 @@ public class CommentController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<?>> create(@RequestBody CommentCreateRequest request) {
+        try {
+            int result = commentService.createComment(request);
 
-        int result = commentService.createComment(request);
+            if (result == 0) {
+                log.warn("[POST /comments] 댓글 등록 실패");
+                return ResponseEntity.internalServerError()
+                        .body(ApiResponse.internalError("댓글 등록 중 문제가 발생했습니다."));
+            }
 
-        if (result == 0) {
-            // 서비스에서 실패한 경우
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.internalError("댓글 등록 중 오류가 발생했습니다."));
+            return ResponseEntity.ok(ApiResponse.ok());
+
+        } catch (IllegalArgumentException e) {
+            log.warn("[POST /comments] 잘못된 요청: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.invalid("댓글 입력 값이 올바르지 않습니다."));
+
+        } catch (Exception e) {
+            log.error("[POST /comments] 서버 오류: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.internalError("댓글 등록 중 문제가 발생했습니다."));
         }
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.ok());
     }
 
     /**
@@ -45,12 +52,20 @@ public class CommentController {
      */
     @GetMapping("/board/{boardId}")
     public ResponseEntity<ApiResponse<?>> list(@PathVariable Integer boardId) {
+        try {
+            List<Comments> comments = commentService.getComments(boardId);
+            return ResponseEntity.ok(ApiResponse.ok(comments));
 
-        List<Comments> comments = commentService.getComments(boardId);
+        } catch (IllegalArgumentException e) {
+            log.warn("[GET /comments/board/{}] 잘못된 요청: {}", boardId, e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.invalid("댓글 조회 요청이 올바르지 않습니다."));
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.ok(comments));
+        } catch (Exception e) {
+            log.error("[GET /comments/board/{}] 서버 오류: {}", boardId, e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.internalError("댓글 조회 중 문제가 발생했습니다."));
+        }
     }
 
     /**
@@ -58,17 +73,26 @@ public class CommentController {
      */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<?>> delete(@PathVariable Integer commentId) {
+        try {
+            int result = commentService.deleteComment(commentId);
 
-        int result = commentService.deleteComment(commentId);
+            if (result == 0) {
+                log.warn("[DELETE /comments/{}] 삭제 대상 없음", commentId);
+                return ResponseEntity.status(404)
+                        .body(ApiResponse.notFound("존재하지 않는 댓글입니다."));
+            }
 
-        if (result == 0) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.notFound("댓글을 찾을 수 없습니다."));
+            return ResponseEntity.ok(ApiResponse.ok());
+
+        } catch (IllegalArgumentException e) {
+            log.warn("[DELETE /comments/{}] 잘못된 요청: {}", commentId, e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.invalid("댓글 삭제 요청이 올바르지 않습니다."));
+
+        } catch (Exception e) {
+            log.error("[DELETE /comments/{}] 서버 오류: {}", commentId, e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.internalError("댓글 삭제 중 문제가 발생했습니다."));
         }
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.ok());
     }
 }
