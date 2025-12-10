@@ -10,5 +10,7 @@ public interface AuthService {
     void saveRefreshToken(String email, String token);
     String findRefreshToken(String email);
     void logout(String email);
-
+    void sendResetPasswordMail(String email);
+    void resetPassword(String email, String code);
 }
+

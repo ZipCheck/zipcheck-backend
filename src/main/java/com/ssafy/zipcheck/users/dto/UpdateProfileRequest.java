@@ -1,14 +1,11 @@
-package com.ssafy.zipcheck.auth.dto;
+package com.ssafy.zipcheck.users.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequest {
-
-    private String email;
-    private String password;
+public class UpdateProfileRequest {
     private String nickname;
     private String profileImage;
 }

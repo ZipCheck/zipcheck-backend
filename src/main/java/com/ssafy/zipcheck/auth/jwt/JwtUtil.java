@@ -1,10 +1,10 @@
 package com.ssafy.zipcheck.auth.jwt;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -16,21 +16,27 @@ public class JwtUtil {
 
     public JwtUtil(JwtProperties properties) {
         this.properties = properties;
-        this.secretKey = new SecretKeySpec(
-                properties.getSecret().getBytes(StandardCharsets.UTF_8),
-                Jwts.SIG.HS256.key().build().getAlgorithm()
+
+        System.out.println("### LOADED SECRET = " + properties.getSecret());
+
+        this.secretKey = Keys.hmacShaKeyFor(
+                properties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
     }
 
     public String getUsername(String token) {
-        return Jwts.parser().verifyWith(secretKey).build()
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("username", String.class);
     }
 
     public String getRole(String token) {
-        return Jwts.parser().verifyWith(secretKey).build()
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("role", String.class);
@@ -41,7 +47,6 @@ public class JwtUtil {
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token);
-        // parseSignedClaims 내부에서 만료 시 ExpiredJwtException throw
     }
 
     public String createAccessToken(String username, String role) {
@@ -53,7 +58,9 @@ public class JwtUtil {
     }
 
     public String getCategory(String token) {
-        return Jwts.parser().verifyWith(secretKey).build()
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("category", String.class);
@@ -66,8 +73,7 @@ public class JwtUtil {
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
+                .signWith(secretKey)  // Key setting is now correct
                 .compact();
     }
-
 }

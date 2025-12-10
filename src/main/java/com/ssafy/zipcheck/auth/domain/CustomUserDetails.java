@@ -13,13 +13,14 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-
         authorities.add((GrantedAuthority) () -> user.getRole());
-
         return authorities;
     }
 
@@ -30,7 +31,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail(); // 이메일을 username으로 사용
+        return user.getEmail();
     }
 
     @Override
@@ -45,3 +46,4 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 }
+
