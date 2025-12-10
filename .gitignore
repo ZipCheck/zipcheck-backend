@@ -35,10 +35,23 @@ build/
 # ============================
 # Spring Boot 환경 설정 파일
 # ============================
-# application-{env}.properties / yml 모두 제외
 src/main/resources/application*.properties
 src/main/resources/application*.yml
 
 # 환경 변수 파일 (.env)
 .env
 .env.*
+
+# ============================
+# 로그 및 시스템 파일
+# ============================
+*.log
+logs/
+.DS_Store
+Thumbs.db
+
+# ============================
+# Node / Front-end (사용 시)
+# ============================
+node_modules/
+npm-debug.log

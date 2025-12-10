@@ -5,10 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequest {
-
+public class PasswordResetConfirmRequest {
     private String email;
-    private String password;
-    private String nickname;
-    private String profileImage;
+    private String code;
 }

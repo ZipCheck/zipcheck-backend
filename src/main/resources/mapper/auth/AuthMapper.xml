@@ -25,10 +25,10 @@
             status,
             role
         ) VALUES (
-                     #{email},
-                     #{password},
-                     #{nickname},
-                     #{profileImage},
+                     #{dto.email},
+                     #{dto.password},
+                     #{dto.nickname},
+                     #{dto.profileImage},
                      1,
                      #{role}
                  )
