@@ -25,7 +25,7 @@ import java.util.Collections;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
-    private final JwtUtil jwtUtil;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public BCryptPasswordEncoder encoder() {
@@ -57,7 +57,13 @@ public class SecurityConfig {
         http.httpBasic(basic -> basic.disable());
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
+                .requestMatchers(
+                        "/auth/signup",
+                        "/auth/login",
+                        "/auth/reissue",
+                        "/auth/password/reset",
+                        "/auth/password/reset-confirm"
+                ).permitAll()
                 .anyRequest().authenticated()
         );
 
@@ -65,9 +71,8 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
-        http.addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 }
-

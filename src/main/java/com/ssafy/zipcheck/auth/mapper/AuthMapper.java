@@ -1,7 +1,6 @@
 package com.ssafy.zipcheck.auth.mapper;
 
 import com.ssafy.zipcheck.auth.dto.SignupRequest;
-import com.ssafy.zipcheck.users.dto.UpdatePasswordRequest;
 import com.ssafy.zipcheck.users.vo.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,12 +11,10 @@ import java.util.Optional;
 public interface AuthMapper {
 
     int existsByEmail(String email);
-
     int existsByNickname(String nickname);
 
-    int insertUser(@Param("dto") SignupRequest dto, @Param("role") String role);
-
-    int updatePassword(UpdatePasswordRequest dto);
+    int insertUser(@Param("dto") SignupRequest dto,
+                   @Param("role") String role);
 
     Optional<User> findByEmail(String email);
 
@@ -27,5 +24,4 @@ public interface AuthMapper {
     String findRefreshToken(String email);
 
     void deleteRefreshToken(String email);
-
 }

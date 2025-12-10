@@ -1,10 +1,8 @@
 package com.ssafy.zipcheck.auth.controller;
 
 import com.ssafy.zipcheck.auth.domain.CustomUserDetails;
-import com.ssafy.zipcheck.auth.dto.LoginResponse;
+import com.ssafy.zipcheck.auth.dto.*;
 import com.ssafy.zipcheck.auth.jwt.JwtUtil;
-import com.ssafy.zipcheck.auth.dto.LoginRequest;
-import com.ssafy.zipcheck.auth.dto.SignupRequest;
 import com.ssafy.zipcheck.auth.service.AuthService;
 import com.ssafy.zipcheck.users.vo.User;
 import com.ssafy.zipcheck.common.response.ApiResponse;
@@ -177,6 +175,30 @@ public class AuthController {
 
         } catch (Exception e) {
             return ApiResponse.internalError("로그아웃 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/password/reset")
+    public ApiResponse<?> requestPasswordReset(@RequestBody PasswordResetEmailRequest req) {
+        try {
+            authService.sendResetPasswordMail(req.getEmail());
+            return ApiResponse.ok("이메일로 인증 코드가 발송되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.badRequest(e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.internalError("비밀번호 초기화 요청 중 오류 발생");
+        }
+    }
+
+    @PostMapping("/password/reset-confirm")
+    public ApiResponse<?> confirmPasswordReset(@RequestBody PasswordResetConfirmRequest req) {
+        try {
+            authService.resetPassword(req.getEmail(), req.getCode());
+            return ApiResponse.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.badRequest(e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.internalError("비밀번호 초기화 중 오류 발생");
         }
     }
 
