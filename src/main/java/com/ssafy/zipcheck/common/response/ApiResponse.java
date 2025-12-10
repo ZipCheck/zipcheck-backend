@@ -38,7 +38,7 @@ public class ApiResponse<T> {
     }
 
     // ============================
-    // 실패 응답
+    // 실패 응답 (기본)
     // ============================
     public static <T> ApiResponse<T> badRequest(String msg) {
         return ApiResponse.<T>builder()
@@ -59,6 +59,48 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> internalError(String msg) {
         return ApiResponse.<T>builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message(msg)
+                .data(null)
+                .build();
+    }
+
+    // ============================
+    // 인증/인가 관련 에러
+    // ============================
+    public static <T> ApiResponse<T> unauthorized(String msg) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(msg)
+                .data(null)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> forbidden(String msg) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.FORBIDDEN)
+                .message(msg)
+                .data(null)
+                .build();
+    }
+
+    // ============================
+    // 중복 / 충돌 에러
+    // ============================
+    public static <T> ApiResponse<T> conflict(String msg) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.CONFLICT)
+                .message(msg)
+                .data(null)
+                .build();
+    }
+
+    // ============================
+    // 유효성 검증 오류
+    // (DTO Validation 실패 시 사용)
+    // ============================
+    public static <T> ApiResponse<T> invalid(String msg) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .message(msg)
                 .data(null)
                 .build();
