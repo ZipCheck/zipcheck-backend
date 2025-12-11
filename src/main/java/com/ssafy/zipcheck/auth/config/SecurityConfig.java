@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -57,6 +58,25 @@ public class SecurityConfig {
         http.httpBasic(basic -> basic.disable());
 
         http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET,
+                        "/boards",
+                        "/boards/**"
+                ).permitAll()   // 조회만 open
+
+                .requestMatchers(HttpMethod.POST,
+                        "/boards",
+                        "/boards/*/like"
+                ).authenticated()  // 등록 + 좋아요
+
+                .requestMatchers(HttpMethod.PUT,
+                        "/boards/**"
+                ).authenticated() // 수정
+
+                .requestMatchers(HttpMethod.DELETE,
+                        "/boards/**"
+                ).authenticated() // 삭제
+
+                // auth 관련은 모두 허용
                 .requestMatchers(
                         "/auth/signup",
                         "/auth/login",
@@ -64,8 +84,10 @@ public class SecurityConfig {
                         "/auth/password/reset",
                         "/auth/password/reset-confirm"
                 ).permitAll()
+
                 .anyRequest().authenticated()
         );
+
 
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
