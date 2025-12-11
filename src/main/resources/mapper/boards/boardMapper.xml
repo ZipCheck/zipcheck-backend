@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.ssafy.zipcheck.boards.mapper.BoardMapper">
 
     <resultMap id="boardResultMap" type="com.ssafy.zipcheck.boards.vo.Boards">
@@ -9,48 +12,88 @@
         <result property="hit" column="hit"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
-        <result property="userId" column="user_id"/>
+        <result property="userId" column="users_user_id"/>
         <result property="visible" column="visible"/>
+        <result property="nickname" column="nickname"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="isLiked" column="is_liked"/>
     </resultMap>
 
-    <insert id="save" parameterType="com.ssafy.zipcheck.boards.vo.Boards" useGeneratedKeys="true" keyProperty="boardId">
-        INSERT INTO board (title, content, hit, created_at, updated_at, user_id, visible)
-        VALUES (#{title}, #{content}, 0, NOW(), NOW(), #{userId}, #{visible})
+    <!-- 게시글 저장 -->
+    <insert id="save" parameterType="Boards" useGeneratedKeys="true" keyProperty="boardId">
+        INSERT INTO boards (title, content, hit, created_at, users_user_id, visible)
+        VALUES (#{title}, #{content}, 0, NOW(), #{userId}, true)
     </insert>
 
+    <!-- 게시글 목록 (정렬 + isLiked + likeCount 포함) -->
     <select id="findAll" resultMap="boardResultMap">
-        SELECT board_id, title, content, hit, created_at, updated_at, user_id, visible
-        FROM board
-        ORDER BY created_at DESC
+        SELECT
+        b.*,
+        u.nickname,
+        (SELECT COUNT(*)
+        FROM likes l
+        WHERE l.boards_board_id = b.board_id) AS like_count,
+        CASE
+        WHEN #{userId} IS NULL THEN 0
+        WHEN EXISTS (
+        SELECT 1
+        FROM likes l2
+        WHERE l2.boards_board_id = b.board_id
+        AND l2.users_user_id = #{userId}
+        ) THEN 1
+        ELSE 0
+        END AS is_liked
+        FROM boards b
+        JOIN users u ON b.users_user_id = u.user_id
+        WHERE b.visible = 1
+
+        <choose>
+            <when test="order == 'likes'">
+                ORDER BY like_count DESC, b.created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY b.created_at DESC
+            </otherwise>
+        </choose>
     </select>
 
-    <select id="findById" parameterType="int" resultMap="boardResultMap">
-        SELECT board_id, title, content, hit, created_at, updated_at, user_id, visible
-        FROM board
-        WHERE board_id = #{boardId}
+    <!-- 게시글 상세 조회 -->
+    <select id="findById" resultMap="boardResultMap">
+        SELECT
+            b.*,
+            u.nickname,
+            (SELECT COUNT(*)
+             FROM likes l
+             WHERE l.boards_board_id = b.board_id) AS like_count,
+            CASE
+                WHEN #{userId} IS NULL THEN 0
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM likes l2
+                    WHERE l2.boards_board_id = b.board_id
+                      AND l2.users_user_id = #{userId}
+                ) THEN 1
+                ELSE 0
+                END AS is_liked
+        FROM boards b
+                 JOIN users u ON b.users_user_id = u.user_id
+        WHERE b.board_id = #{boardId}
     </select>
 
-    <update id="update" parameterType="com.ssafy.zipcheck.boards.vo.Boards">
-        UPDATE board
-        SET title = #{title}, content = #{content}, updated_at = NOW(), visible = #{visible}
+    <update id="update" parameterType="Boards">
+        UPDATE boards
+        SET title = #{title},
+            content = #{content},
+            updated_at = NOW()
         WHERE board_id = #{boardId}
     </update>
 
-    <delete id="delete" parameterType="int">
-        DELETE FROM board
-        WHERE board_id = #{boardId}
+    <delete id="delete">
+        DELETE FROM boards WHERE board_id = #{boardId}
     </delete>
 
-    <update id="incrementHit" parameterType="int">
-        UPDATE board
-        SET hit = hit + 1
-        WHERE board_id = #{boardId}
-    </update>
-
-    <update id="incrementLike" parameterType="int">
-        UPDATE board
-        SET likes = likes + 1
-        WHERE board_id = #{boardId}
+    <update id="incrementHit">
+        UPDATE boards SET hit = hit + 1 WHERE board_id = #{boardId}
     </update>
 
 </mapper>

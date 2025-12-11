@@ -1,16 +1,14 @@
 package com.ssafy.zipcheck.boards.service;
 
-import com.ssafy.zipcheck.boards.dto.BoardCreateDto;
-import com.ssafy.zipcheck.boards.dto.BoardDetailDto;
-import com.ssafy.zipcheck.boards.dto.BoardListDto;
-import com.ssafy.zipcheck.boards.dto.BoardUpdateDto;
+import com.ssafy.zipcheck.boards.dto.*;
+
 import java.util.List;
 
 public interface BoardService {
-    void registerBoard(BoardCreateDto createDto);
-    List<BoardListDto> getAllBoards();
-    BoardDetailDto getBoardById(int boardId);
-    void updateBoard(int boardId, BoardUpdateDto updateDto);
-    void deleteBoard(int boardId);
-    void likeBoard(int boardId);
+    void registerBoard(BoardCreateDto dto);
+    List<BoardListDto> getAllBoards(Integer userId, String order);
+    BoardDetailDto getBoardById(int boardId, Integer userId);
+    void updateBoard(int boardId, BoardUpdateDto dto, int userId);
+    void deleteBoard(int boardId, int userId);
+    boolean toggleLike(int boardId, int userId);
 }
