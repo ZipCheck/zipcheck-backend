@@ -5,31 +5,34 @@
 
 <mapper namespace="com.ssafy.zipcheck.comments.mapper.CommentMapper">
 
-    <resultMap id="CommentMap" type="com.ssafy.zipcheck.comments.vo.Comments">
-        <id property="commentId" column="comment_id"/>
-        <result property="content" column="content"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="boardId" column="boards_board_id"/>
-        <result property="userId" column="users_user_id"/>
-        <result property="visible" column="visible"/>
-    </resultMap>
-
-    <!-- 댓글 목록 조회 -->
-    <select id="findByBoardId" resultMap="CommentMap">
-        SELECT *
-        FROM comments
-        WHERE boards_board_id = #{boardId}
-          AND visible = 1
-        ORDER BY created_at ASC
+    <!-- 댓글 조회 (닉네임 포함) -->
+    <select id="findByBoardId" resultType="com.ssafy.zipcheck.comments.dto.CommentResponse">
+        SELECT
+            c.comment_id,
+            c.content,
+            u.nickname,
+            DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') AS createdAt
+        FROM comments c
+                 JOIN users u ON c.user_id = u.user_id
+        WHERE c.board_id = #{boardId}
+          AND c.visible = 1
+        ORDER BY c.created_at ASC
     </select>
 
     <!-- 댓글 등록 -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="commentId">
-        INSERT INTO comments (content, created_at, boards_board_id, users_user_id, visible)
+        INSERT INTO comments (content, created_at, board_id, user_id, visible)
         VALUES (#{content}, NOW(), #{boardId}, #{userId}, 1)
     </insert>
 
-    <!-- 댓글 삭제 (soft delete) -->
+    <!-- 댓글 작성자 조회 -->
+    <select id="findOwner" resultType="int">
+        SELECT user_id
+        FROM comments
+        WHERE comment_id = #{commentId}
+    </select>
+
+    <!-- soft delete -->
     <update id="delete">
         UPDATE comments
         SET visible = 0

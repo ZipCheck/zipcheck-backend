@@ -1,15 +1,15 @@
 package com.ssafy.zipcheck.comments.service;
 
 import com.ssafy.zipcheck.comments.dto.CommentCreateRequest;
-import com.ssafy.zipcheck.comments.vo.Comments;
+import com.ssafy.zipcheck.comments.dto.CommentResponse;
 
 import java.util.List;
 
 public interface CommentService {
 
-    List<Comments> getComments(Integer boardId);
+    List<CommentResponse> getComments(Integer boardId);
 
     int createComment(CommentCreateRequest request);
 
-    int deleteComment(Integer commentId);
+    void deleteComment(Integer commentId, int userId);
 }
