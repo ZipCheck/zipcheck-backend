@@ -12,7 +12,9 @@ public class BoardDetailDto {
     private final int hit;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
-    private final int userId;
+    private final String nickname;
+    private final int likeCount;
+    private final boolean isLiked;
 
     public BoardDetailDto(Boards board) {
         this.boardId = board.getBoardId();
@@ -21,6 +23,8 @@ public class BoardDetailDto {
         this.hit = board.getHit();
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();
-        this.userId = board.getUserId();
+        this.nickname = board.getNickname();
+        this.likeCount = board.getLikeCount();
+        this.isLiked = board.isLiked();
     }
 }
