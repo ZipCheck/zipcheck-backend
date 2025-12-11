@@ -13,4 +13,7 @@ public class Boards {
     private LocalDateTime updatedAt; // 수정 시간
     private int userId;             // 작성자 users.user_id
     private boolean visible;        // 공개 여부
+    private int likeCount;          // 좋아요 개수
+    private String nickname;
+    private boolean isLiked;  // 현재 로그인 유저가 좋아요 눌렀는가
 }
