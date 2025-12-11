@@ -1,13 +1,13 @@
 package com.ssafy.zipcheck.comments.service;
 
 import com.ssafy.zipcheck.comments.dto.CommentCreateRequest;
+import com.ssafy.zipcheck.comments.dto.CommentResponse;
 import com.ssafy.zipcheck.comments.mapper.CommentMapper;
 import com.ssafy.zipcheck.comments.vo.Comments;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -17,47 +17,37 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
 
-    /**
-     * 특정 게시글의 댓글 조회
-     */
     @Override
-    public List<Comments> getComments(Integer boardId) {
-        try {
-            return commentMapper.findByBoardId(boardId);
-        } catch (Exception e) {
-            log.error("[SERVICE ERROR] 댓글 조회 실패 boardId={}: {}", boardId, e.getMessage(), e);
-            return Collections.emptyList();   // 실패 시 빈 리스트 반환
-        }
+    public List<CommentResponse> getComments(Integer boardId) {
+        return commentMapper.findByBoardId(boardId);
     }
 
-    /**
-     * 댓글 등록
-     */
     @Override
     public int createComment(CommentCreateRequest request) {
-        try {
-            Comments comment = new Comments();
-            comment.setBoardId(request.getBoardId());
-            comment.setUserId(request.getUserId());
-            comment.setContent(request.getContent());
-
-            return commentMapper.insert(comment);
-        } catch (Exception e) {
-            log.error("[SERVICE ERROR] 댓글 등록 실패: {}", e.getMessage(), e);
-            return 0;   // 실패 시 0 반환
+        if (request.getContent() == null || request.getContent().isBlank()) {
+            throw new IllegalArgumentException("댓글 내용이 비어있습니다.");
         }
+
+        Comments comment = new Comments();
+        comment.setBoardId(request.getBoardId());
+        comment.setUserId(request.getUserId());
+        comment.setContent(request.getContent());
+
+        return commentMapper.insert(comment);
     }
 
-    /**
-     * 댓글 삭제
-     */
     @Override
-    public int deleteComment(Integer commentId) {
-        try {
-            return commentMapper.delete(commentId);
-        } catch (Exception e) {
-            log.error("[SERVICE ERROR] 댓글 삭제 실패 commentId={}: {}", commentId, e.getMessage(), e);
-            return 0;   // 실패 시 0 반환
+    public void deleteComment(Integer commentId, int userId) {
+
+        Integer ownerId = commentMapper.findOwner(commentId);
+        if (ownerId == null) {
+            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
         }
+
+        if (!ownerId.equals(userId)) {
+            throw new IllegalArgumentException("본인 댓글만 삭제할 수 있습니다.");
+        }
+
+        commentMapper.delete(commentId);
     }
 }
