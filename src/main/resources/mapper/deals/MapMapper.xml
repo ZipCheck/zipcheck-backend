@@ -65,10 +65,10 @@
                 AND hd.exclu_use_ar &lt;= #{maxArea}
             </if>
             <if test="minPrice != null">
-                AND hd.deal_amount_num &gt;= #{minPrice}
+                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &gt;= #{minPrice}
             </if>
             <if test="maxPrice != null">
-                AND hd.deal_amount_num &lt;= #{maxPrice}
+                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &lt;= #{maxPrice}
             </if>
         </where>
         ORDER BY hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
