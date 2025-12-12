@@ -1,6 +1,5 @@
 package com.ssafy.zipcheck.notice.mapper;
 
-import com.ssafy.zipcheck.notice.dto.NoticeListResponse;
 import com.ssafy.zipcheck.notice.dto.NoticeResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,15 +9,19 @@ import java.util.List;
 @Mapper
 public interface NoticeMapper {
 
-    int insert(
-            @Param("title") String title,
-            @Param("content") String content,
-            @Param("userId") int userId
-    );
+    List<NoticeResponse> findAll();
 
-    List<NoticeListResponse> findAll();
+    NoticeResponse findById(int noticeId);
 
-    NoticeResponse findById(@Param("noticeId") int noticeId);
+    int insert(@Param("userId") int userId,
+               @Param("title") String title,
+               @Param("content") String content);
 
-    int increaseHit(@Param("noticeId") int noticeId);
+    int update(@Param("noticeId") int noticeId,
+               @Param("title") String title,
+               @Param("content") String content);
+
+    int delete(int noticeId);
+
+    void incrementHit(int noticeId);
 }

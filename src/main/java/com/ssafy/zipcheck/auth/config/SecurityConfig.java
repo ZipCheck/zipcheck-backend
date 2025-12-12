@@ -2,13 +2,13 @@ package com.ssafy.zipcheck.auth.config;
 
 import com.ssafy.zipcheck.auth.jwt.JwtFilter;
 import com.ssafy.zipcheck.auth.jwt.JwtProperties;
-import com.ssafy.zipcheck.auth.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +22,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
@@ -58,27 +59,60 @@ public class SecurityConfig {
         http.httpBasic(basic -> basic.disable());
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/notices").permitAll()
-                .requestMatchers("/notices/**").permitAll()
-                .requestMatchers(HttpMethod.GET,
-                        "/boards",
-                        "/boards/**"
-                ).permitAll()   // 조회만 open
+
+                // =========================
+                // 공지사항
+                // =========================
+                .requestMatchers(HttpMethod.GET, "/notices", "/notices/**")
+                .permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/notices")
+                .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/notices/**")
+                .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE, "/notices/**")
+                .hasRole("ADMIN")
+
+                // =========================
+                // 게시글
+                // =========================
+                .requestMatchers(HttpMethod.GET, "/boards", "/boards/**")
+                .permitAll()
 
                 .requestMatchers(HttpMethod.POST,
                         "/boards",
                         "/boards/*/like"
-                ).authenticated()  // 등록 + 좋아요
+                ).hasAnyRole("USER", "ADMIN")
 
-                .requestMatchers(HttpMethod.PUT,
-                        "/boards/**"
-                ).authenticated() // 수정
+                .requestMatchers(HttpMethod.PUT, "/boards/**")
+                .hasAnyRole("USER", "ADMIN")
 
-                .requestMatchers(HttpMethod.DELETE,
-                        "/boards/**"
-                ).authenticated() // 삭제
+                .requestMatchers(HttpMethod.DELETE, "/boards/**")
+                .hasAnyRole("USER", "ADMIN")
 
-                // auth 관련은 모두 허용
+                // =========================
+                // 댓글
+                // =========================
+                .requestMatchers(HttpMethod.GET, "/comments/**")
+                .permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/comments")
+                .hasAnyRole("USER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE, "/comments/**")
+                .hasAnyRole("USER", "ADMIN")
+
+                // =========================
+                // 마이페이지
+                // =========================
+                .requestMatchers("/users/**")
+                .hasAnyRole("USER", "ADMIN")
+
+                // =========================
+                // 인증 관련
+                // =========================
                 .requestMatchers(
                         "/auth/signup",
                         "/auth/login",
@@ -89,7 +123,6 @@ public class SecurityConfig {
 
                 .anyRequest().authenticated()
         );
-
 
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
