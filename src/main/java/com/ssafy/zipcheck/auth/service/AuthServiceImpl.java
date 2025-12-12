@@ -1,5 +1,6 @@
 package com.ssafy.zipcheck.auth.service;
 
+import com.ssafy.zipcheck.auth.domain.Role;
 import com.ssafy.zipcheck.auth.dto.SignupRequest;
 import com.ssafy.zipcheck.auth.mapper.AuthMapper;
 import com.ssafy.zipcheck.auth.util.EmailAuthStorage;
@@ -32,9 +33,9 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
 
         request.setPassword(encoder.encode(request.getPassword()));
-        String role = "ROLE_USER";
 
-        authMapper.insertUser(request, role);
+        // 회원가입은 항상 USER
+        authMapper.insertUser(request, Role.USER);
     }
 
     @Override
