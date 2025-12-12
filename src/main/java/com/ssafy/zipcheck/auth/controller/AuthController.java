@@ -32,14 +32,22 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignupRequest request) {
         try {
+            // 프로필 이미지 용량 최소 방어 (Base64 기준)
+            if (request.getProfileImage() != null &&
+                    request.getProfileImage().length() > 5_000_000) {
+                throw new IllegalArgumentException("프로필 이미지 용량 초과");
+            }
+
             authService.signup(request);
-            return ResponseEntity.ok(ApiResponse.ok());
+            return ResponseEntity.ok(ApiResponse.ok("회원가입 완료"));
+
         } catch (IllegalArgumentException e) {
             log.warn("[POST /auth/signup] 잘못된 요청: {}", e.getMessage());
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.invalid("회원가입 요청이 올바르지 않습니다."));
+                    .body(ApiResponse.invalid(e.getMessage()));
+
         } catch (Exception e) {
-            log.error("[POST /auth/signup] 서버 오류: {}", e.getMessage(), e);
+            log.error("[POST /auth/signup] 서버 오류", e);
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.internalError("회원가입 중 문제가 발생했습니다."));
         }
@@ -74,7 +82,8 @@ public class AuthController {
                     user.getEmail(),
                     user.getNickname(),
                     user.getRole(),
-                    access
+                    access,
+                    user.getProfileImage()
             );
 
             return ResponseEntity.ok(ApiResponse.ok(loginResponse));
