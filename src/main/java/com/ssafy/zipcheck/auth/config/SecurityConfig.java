@@ -58,6 +58,8 @@ public class SecurityConfig {
         http.httpBasic(basic -> basic.disable());
 
         http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/notices").permitAll()
+                .requestMatchers("/notices/**").permitAll()
                 .requestMatchers(HttpMethod.GET,
                         "/boards",
                         "/boards/**"
