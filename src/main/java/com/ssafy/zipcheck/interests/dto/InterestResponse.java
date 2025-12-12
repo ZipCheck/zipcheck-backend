@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class InterestResponse {
     // From interests table
-    private Long interestId;
+    private Integer interestId;
 
     // From houseinfos table
     private String aptSeq;
@@ -17,7 +17,7 @@ public class InterestResponse {
     private Double longitude;
 
     // From housedeals table
-    private Long no; // deal number
+    private Integer no; // deal number
     private String aptDong;
     private String floor;
     private Integer dealYear;

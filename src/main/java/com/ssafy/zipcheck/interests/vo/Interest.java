@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class Interest {
-    private Long interestId;
+    private Integer interestId;
     private Integer userId;
-    private String aptSeq;
+    private Integer dealNo;
     private LocalDateTime createdAt;
 }

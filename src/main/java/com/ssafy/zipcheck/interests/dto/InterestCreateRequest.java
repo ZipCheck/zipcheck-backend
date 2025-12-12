@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class InterestCreateRequest {
-    private String aptSeq;
+    private Integer dealNo;
 }
