@@ -28,9 +28,14 @@ public class UserService {
 
     public void updateProfile(int userId, UpdateProfileRequest req) {
 
-        // 닉네임 검증 (필요 시 정책에 맞게 조정)
         if (req.getNickname() == null || req.getNickname().isBlank()) {
             throw new IllegalArgumentException("닉네임을 입력하세요.");
+        }
+
+        // 프로필 이미지 크기 제한 (Base64 기준)
+        if (req.getProfileImage() != null &&
+                req.getProfileImage().length() > 5_000_000) {
+            throw new IllegalArgumentException("프로필 이미지 용량 초과");
         }
 
         int updated = userMapper.updateProfile(
