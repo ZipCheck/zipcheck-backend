@@ -37,6 +37,22 @@ public class ApiResponse<T> {
                 .build();
     }
 
+    public static <T> ApiResponse<T> ok(String message, T data) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.OK)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> created(String message) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.CREATED)
+                .message(message)
+                .data(null)
+                .build();
+    }
+
     // ============================
     // 실패 응답 (기본)
     // ============================
@@ -51,6 +67,14 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> notFound(String msg) {
         return ApiResponse.<T>builder()
                 .status(HttpStatus.NOT_FOUND)
+                .message(msg)
+                .data(null)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> conflict(String msg) {
+        return ApiResponse.<T>builder()
+                .status(HttpStatus.CONFLICT)
                 .message(msg)
                 .data(null)
                 .build();
