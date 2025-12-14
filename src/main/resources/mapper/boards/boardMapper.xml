@@ -20,7 +20,7 @@
     </resultMap>
 
     <!-- 게시글 저장 -->
-    <insert id="save" parameterType="Boards" useGeneratedKeys="true" keyProperty="boardId">
+    <insert id="save" parameterType="com.ssafy.zipcheck.boards.vo.Boards" useGeneratedKeys="true" keyProperty="boardId">
         INSERT INTO boards (title, content, hit, created_at, users_user_id, visible)
         VALUES (#{title}, #{content}, 0, NOW(), #{userId}, true)
     </insert>
@@ -80,7 +80,7 @@
         WHERE b.board_id = #{boardId}
     </select>
 
-    <update id="update" parameterType="Boards">
+    <update id="update" parameterType="com.ssafy.zipcheck.boards.vo.Boards">
         UPDATE boards
         SET title = #{title},
             content = #{content},
