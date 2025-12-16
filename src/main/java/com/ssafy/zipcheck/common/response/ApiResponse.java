@@ -108,17 +108,6 @@ public class ApiResponse<T> {
     }
 
     // ============================
-    // 중복 / 충돌 에러
-    // ============================
-    public static <T> ApiResponse<T> conflict(String msg) {
-        return ApiResponse.<T>builder()
-                .status(HttpStatus.CONFLICT)
-                .message(msg)
-                .data(null)
-                .build();
-    }
-
-    // ============================
     // 유효성 검증 오류
     // (DTO Validation 실패 시 사용)
     // ============================
