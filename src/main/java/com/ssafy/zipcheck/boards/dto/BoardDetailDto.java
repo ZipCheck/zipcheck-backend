@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class BoardDetailDto {
     private final int boardId;
     private final String title;
+    private final String category;
     private final String content;
     private final int hit;
     private final LocalDateTime createdAt;
@@ -19,6 +20,7 @@ public class BoardDetailDto {
     public BoardDetailDto(Boards board) {
         this.boardId = board.getBoardId();
         this.title = board.getTitle();
+        this.category = board.getCategory();
         this.content = board.getContent();
         this.hit = board.getHit();
         this.createdAt = board.getCreatedAt();

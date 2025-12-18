@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class NoticeUpdateRequest {
     private String title;
+    private String category;
     private String content;
 }
