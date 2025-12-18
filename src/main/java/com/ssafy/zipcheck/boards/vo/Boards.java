@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public class Boards {
     private int boardId;            // PK
     private String title;           // 제목
+    private String category;        // 카테고리
     private String content;         // 내용
     private int hit;                // 조회수
     private LocalDateTime createdAt; // 생성 시간

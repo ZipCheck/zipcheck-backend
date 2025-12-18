@@ -72,14 +72,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> conflict(String msg) {
-        return ApiResponse.<T>builder()
-                .status(HttpStatus.CONFLICT)
-                .message(msg)
-                .data(null)
-                .build();
-    }
-
     public static <T> ApiResponse<T> internalError(String msg) {
         return ApiResponse.<T>builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

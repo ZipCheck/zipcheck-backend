@@ -53,6 +53,7 @@ public class BoardServiceImpl implements BoardService {
             throw new IllegalArgumentException("본인이 작성한 게시글만 수정할 수 있습니다.");
 
         board.setTitle(dto.getTitle());
+        board.setCategory(dto.getCategory());
         board.setContent(dto.getContent());
 
         boardMapper.update(board);

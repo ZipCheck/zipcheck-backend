@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class BoardListDto {
     private final int boardId;
     private final String title;
+    private final String category;
     private final int hit;
     private final LocalDateTime createdAt;
     private final String nickname;
@@ -18,6 +19,7 @@ public class BoardListDto {
     public BoardListDto(Boards board) {
         this.boardId = board.getBoardId();
         this.title = board.getTitle();
+        this.category = board.getCategory();
         this.hit = board.getHit();
         this.createdAt = board.getCreatedAt();
         this.nickname = board.getNickname();

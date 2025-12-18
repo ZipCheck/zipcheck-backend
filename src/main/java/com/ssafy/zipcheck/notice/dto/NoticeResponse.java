@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class NoticeResponse {
     private Integer noticeId;
     private String title;
+    private String category;
     private String content;
     private String nickname;
     private Integer hit;
