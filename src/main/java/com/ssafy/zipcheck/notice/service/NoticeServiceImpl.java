@@ -1,6 +1,7 @@
 package com.ssafy.zipcheck.notice.service;
 
 import com.ssafy.zipcheck.notice.dto.NoticeCreateRequest;
+import com.ssafy.zipcheck.notice.dto.NoticeListResponse;
 import com.ssafy.zipcheck.notice.dto.NoticeResponse;
 import com.ssafy.zipcheck.notice.dto.NoticeUpdateRequest;
 import com.ssafy.zipcheck.notice.mapper.NoticeMapper;
@@ -16,13 +17,13 @@ public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeMapper noticeMapper;
 
-    // 전체 / 카테고리별 공지 조회
+    // 공지 목록
     @Override
-    public List<NoticeResponse> getNotices(String category) {
+    public List<NoticeListResponse> getNotices(String category) {
         return noticeMapper.findAll(category);
     }
 
-    // 공지 상세 조회 (+ 조회수 증가)
+    // 공지 상세
     @Override
     @Transactional
     public NoticeResponse getNotice(int noticeId) {
@@ -35,7 +36,6 @@ public class NoticeServiceImpl implements NoticeService {
         return notice;
     }
 
-    // 공지 등록
     @Override
     public void createNotice(int userId, NoticeCreateRequest request) {
         noticeMapper.insert(
@@ -46,7 +46,6 @@ public class NoticeServiceImpl implements NoticeService {
         );
     }
 
-    // 공지 수정
     @Override
     public void updateNotice(int noticeId, NoticeUpdateRequest request) {
         int updated = noticeMapper.update(
@@ -61,7 +60,6 @@ public class NoticeServiceImpl implements NoticeService {
         }
     }
 
-    // 공지 삭제
     @Override
     public void deleteNotice(int noticeId) {
         int deleted = noticeMapper.delete(noticeId);

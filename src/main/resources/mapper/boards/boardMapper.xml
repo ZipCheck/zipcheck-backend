@@ -20,50 +20,35 @@
         <result property="visible" column="visible"/>
         <result property="nickname" column="nickname"/>
         <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
         <result property="isLiked" column="is_liked"/>
     </resultMap>
 
     <!-- ========================================================= -->
     <!-- 게시글 저장 -->
-<<<<<<< HEAD
-    <insert id="save" parameterType="com.ssafy.zipcheck.boards.vo.Boards" useGeneratedKeys="true" keyProperty="boardId">
-        INSERT INTO boards (title, content, hit, created_at, users_user_id, visible)
-        VALUES (#{title}, #{content}, 0, NOW(), #{userId}, true)
-=======
     <!-- ========================================================= -->
-    <insert id="save" parameterType="com.ssafy.zipcheck.boards.vo.Boards"
-            useGeneratedKeys="true" keyProperty="boardId">
-        INSERT INTO boards (
-        title,
-        category,
-        content,
-        hit,
-        created_at,
-        users_user_id,
-        visible
-        )
-        VALUES (
-        #{title},
-        #{category},
-        #{content},
-        0,
-        NOW(),
-        #{userId},
-        true
-        )
->>>>>>> 02807b6 (feat: 게시글, 공지사항 카테고리 추가)
+    <insert id="save" useGeneratedKeys="true" keyProperty="boardId">
+        INSERT INTO boards (title, category, content, hit, created_at, users_user_id, visible)
+        VALUES (#{title}, #{category}, #{content}, 0, NOW(), #{userId}, true)
     </insert>
 
     <!-- ========================================================= -->
-    <!-- 게시글 목록 조회 (정렬 + 좋아요 + isLiked) -->
+    <!-- 게시글 전체 목록 -->
     <!-- ========================================================= -->
     <select id="findAll" resultMap="boardResultMap">
         SELECT
         b.*,
         u.nickname,
+
         (SELECT COUNT(*)
         FROM likes l
         WHERE l.boards_board_id = b.board_id) AS like_count,
+
+        (SELECT COUNT(*)
+        FROM comments c
+        WHERE c.board_id = b.board_id
+        AND c.visible = 1) AS comment_count,
+
         CASE
         WHEN #{userId} IS NULL THEN 0
         WHEN EXISTS (
@@ -74,6 +59,7 @@
         ) THEN 1
         ELSE 0
         END AS is_liked
+
         FROM boards b
         JOIN users u ON b.users_user_id = u.user_id
         WHERE b.visible = 1
@@ -89,42 +75,81 @@
     </select>
 
     <!-- ========================================================= -->
-    <!-- 게시글 상세 조회 -->
+    <!-- 게시글 상세 -->
     <!-- ========================================================= -->
     <select id="findById" resultMap="boardResultMap">
         SELECT
-            b.*,
-            u.nickname,
-            (SELECT COUNT(*)
-             FROM likes l
-             WHERE l.boards_board_id = b.board_id) AS like_count,
-            CASE
-                WHEN #{userId} IS NULL THEN 0
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM likes l2
-                    WHERE l2.boards_board_id = b.board_id
-                      AND l2.users_user_id = #{userId}
-                ) THEN 1
-                ELSE 0
-                END AS is_liked
+        b.*,
+        u.nickname,
+
+        (SELECT COUNT(*)
+        FROM likes l
+        WHERE l.boards_board_id = b.board_id) AS like_count,
+
+        (SELECT COUNT(*)
+        FROM comments c
+        WHERE c.board_id = b.board_id
+        AND c.visible = 1) AS comment_count,
+
+        CASE
+        WHEN #{userId} IS NULL THEN 0
+        WHEN EXISTS (
+        SELECT 1
+        FROM likes l2
+        WHERE l2.boards_board_id = b.board_id
+        AND l2.users_user_id = #{userId}
+        ) THEN 1
+        ELSE 0
+        END AS is_liked
+
         FROM boards b
-                 JOIN users u ON b.users_user_id = u.user_id
+        JOIN users u ON b.users_user_id = u.user_id
         WHERE b.board_id = #{boardId}
     </select>
 
-<<<<<<< HEAD
-=======
+    <!-- ========================================================= -->
+    <!-- 내가 쓴 게시글 -->
+    <!-- ========================================================= -->
+    <select id="findByUserId" resultMap="boardResultMap">
+        SELECT
+        b.*,
+        u.nickname,
+
+        (SELECT COUNT(*)
+        FROM likes l
+        WHERE l.boards_board_id = b.board_id) AS like_count,
+
+        (SELECT COUNT(*)
+        FROM comments c
+        WHERE c.board_id = b.board_id
+        AND c.visible = 1) AS comment_count,
+
+        CASE
+        WHEN EXISTS (
+        SELECT 1
+        FROM likes l2
+        WHERE l2.boards_board_id = b.board_id
+        AND l2.users_user_id = #{userId}
+        ) THEN 1
+        ELSE 0
+        END AS is_liked
+
+        FROM boards b
+        JOIN users u ON b.users_user_id = u.user_id
+        WHERE b.users_user_id = #{userId}
+        AND b.visible = 1
+        ORDER BY b.created_at DESC
+    </select>
+
     <!-- ========================================================= -->
     <!-- 게시글 수정 -->
     <!-- ========================================================= -->
->>>>>>> 02807b6 (feat: 게시글, 공지사항 카테고리 추가)
-    <update id="update" parameterType="com.ssafy.zipcheck.boards.vo.Boards">
+    <update id="update">
         UPDATE boards
         SET title = #{title},
-        category = #{category},
-        content = #{content},
-        updated_at = NOW()
+            category = #{category},
+            content = #{content},
+            updated_at = NOW()
         WHERE board_id = #{boardId}
     </update>
 
@@ -132,17 +157,14 @@
     <!-- 게시글 삭제 -->
     <!-- ========================================================= -->
     <delete id="delete">
-        DELETE FROM boards
-        WHERE board_id = #{boardId}
+        DELETE FROM boards WHERE board_id = #{boardId}
     </delete>
 
     <!-- ========================================================= -->
     <!-- 조회수 증가 -->
     <!-- ========================================================= -->
     <update id="incrementHit">
-        UPDATE boards
-        SET hit = hit + 1
-        WHERE board_id = #{boardId}
+        UPDATE boards SET hit = hit + 1 WHERE board_id = #{boardId}
     </update>
 
 </mapper>

@@ -8,10 +8,24 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
+
     void save(Boards board);
-    List<Boards> findAll(@Param("userId") Integer userId, @Param("order") String order);
-    Boards findById(@Param("boardId") int boardId, @Param("userId") Integer userId);
+
+    List<Boards> findAll(
+            @Param("userId") Integer userId,
+            @Param("order") String order
+    );
+
+    Boards findById(
+            @Param("boardId") int boardId,
+            @Param("userId") Integer userId
+    );
+
     void update(Boards board);
+
     void delete(int boardId);
+
     void incrementHit(int boardId);
+
+    List<Boards> findByUserId(@Param("userId") int userId);
 }

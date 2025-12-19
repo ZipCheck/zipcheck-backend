@@ -8,7 +8,8 @@
     <!-- ================================================= -->
     <!-- 공지사항 목록 -->
     <!-- ================================================= -->
-    <select id="findAll" resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
+    <select id="findAll"
+            resultType="com.ssafy.zipcheck.notice.dto.NoticeListResponse">
         SELECT
         n.notice_id AS noticeId,
         n.title,
@@ -31,17 +32,18 @@
     <!-- ================================================= -->
     <!-- 공지사항 상세 -->
     <!-- ================================================= -->
-    <select id="findById" resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
+    <select id="findById"
+            resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
         SELECT
-        n.notice_id AS noticeId,
-        n.title,
-        n.category,
-        n.content,
-        u.nickname,
-        n.hit,
-        n.created_at AS createdAt
+            n.notice_id AS noticeId,
+            n.title,
+            n.category,
+            n.content,
+            u.nickname,
+            n.hit,
+            n.created_at AS createdAt
         FROM notice n
-        JOIN users u ON n.users_user_id = u.user_id
+                 JOIN users u ON n.users_user_id = u.user_id
         WHERE n.notice_id = #{noticeId}
     </select>
 
@@ -68,9 +70,9 @@
     <update id="update">
         UPDATE notice
         SET title = #{title},
-        category = #{category},
-        content = #{content},
-        updated_at = NOW()
+            category = #{category},
+            content = #{content},
+            updated_at = NOW()
         WHERE notice_id = #{noticeId}
     </update>
 
