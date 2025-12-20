@@ -121,6 +121,13 @@ public class SecurityConfig {
                         "/auth/password/reset-confirm"
                 ).permitAll()
 
+                // =========================
+                // AI 관련 (테스트 편의를 위해 임시로 permitAll)
+                // 배포 전에는 hasRole("ADMIN") 등으로 변경해야 함
+                // =========================
+                .requestMatchers(HttpMethod.POST, "/api/ai/index-reviews").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/ai/deals/**").permitAll()
+
                 .anyRequest().authenticated()
         );
 
