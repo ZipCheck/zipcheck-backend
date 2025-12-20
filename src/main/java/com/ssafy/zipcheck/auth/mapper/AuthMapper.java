@@ -11,10 +11,16 @@ import java.util.Optional;
 public interface AuthMapper {
 
     int existsByEmail(String email);
+
     int existsByNickname(String nickname);
 
-    int insertUser(@Param("dto") SignupRequest dto,
-                   @Param("role") String role);
+    void insertUser(
+            @Param("email") String email,
+            @Param("password") String password,
+            @Param("nickname") String nickname,
+            @Param("profileImageUrl") String profileImageUrl,
+            @Param("role") String role
+    );
 
     Optional<User> findByEmail(String email);
 

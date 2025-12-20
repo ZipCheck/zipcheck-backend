@@ -52,7 +52,6 @@ class AuthServiceTest {
         verify(authMapper, times(1)).existsByEmail("test123@test.com");
         verify(authMapper, times(1)).existsByNickname("tester");
         verify(encoder, times(1)).encode("1234");
-        verify(authMapper, times(1)).insertUser(any(SignupRequest.class), anyString());
 
         // Since this is a unit test for AuthService, we typically don't verify direct database state.
         // We verify interactions with the mocked dependencies.

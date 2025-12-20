@@ -21,14 +21,14 @@
             email,
             password,
             nickname,
-            profile_image,
+            profile_image_url,
             status,
             role
         ) VALUES (
-                     #{dto.email},
-                     #{dto.password},
-                     #{dto.nickname},
-                     #{dto.profileImage},
+                     #{email},
+                     #{password},
+                     #{nickname},
+                     #{profileImageUrl},
                      1,
                      #{role}
                  )

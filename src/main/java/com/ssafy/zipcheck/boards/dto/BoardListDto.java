@@ -13,8 +13,11 @@ public class BoardListDto {
     private String category;
     private int hit;
     private int likeCount;
-    private int commentCount; // ⭐
+    private int commentCount;
+
     private String nickname;
+    private String profileImageUrl;
+
     private boolean isLiked;
     private LocalDateTime createdAt;
 
@@ -26,8 +29,8 @@ public class BoardListDto {
         this.likeCount = board.getLikeCount();
         this.commentCount = board.getCommentCount();
         this.nickname = board.getNickname();
+        this.profileImageUrl = board.getProfileImageUrl();
         this.isLiked = board.isLiked();
         this.createdAt = board.getCreatedAt();
     }
 }
-

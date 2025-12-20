@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class UpdateProfileRequest {
     private String nickname;
-    private String profileImage;
+    private String profileImageUrl; // URL만 받음
 }
