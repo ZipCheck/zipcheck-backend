@@ -18,7 +18,10 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="userId" column="users_user_id"/>
         <result property="visible" column="visible"/>
+
         <result property="nickname" column="nickname"/>
+        <result property="profileImageUrl" column="profile_image_url"/>
+
         <result property="likeCount" column="like_count"/>
         <result property="commentCount" column="comment_count"/>
         <result property="isLiked" column="is_liked"/>
@@ -40,9 +43,11 @@
         b.*,
 
         CASE
-        WHEN u.status = 0 THEN '탈퇴한 사용자'
+        WHEN u.status != 1 THEN '탈퇴한 사용자'
         ELSE u.nickname
         END AS nickname,
+
+        u.profile_image_url,
 
         (SELECT COUNT(*)
         FROM likes l
@@ -86,9 +91,11 @@
             b.*,
 
             CASE
-                WHEN u.status = 0 THEN '탈퇴한 사용자'
+                WHEN u.status != 1 THEN '탈퇴한 사용자'
                 ELSE u.nickname
                 END AS nickname,
+
+            u.profile_image_url,
 
             (SELECT COUNT(*)
              FROM likes l
@@ -123,9 +130,11 @@
             b.*,
 
             CASE
-                WHEN u.status = 0 THEN '탈퇴한 사용자'
+                WHEN u.status != 1 THEN '탈퇴한 사용자'
                 ELSE u.nickname
                 END AS nickname,
+
+            u.profile_image_url,
 
             (SELECT COUNT(*)
              FROM likes l

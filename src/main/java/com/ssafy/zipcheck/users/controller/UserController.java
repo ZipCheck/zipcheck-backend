@@ -10,9 +10,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/users")
@@ -163,4 +166,18 @@ public class UserController {
                     .body(ApiResponse.internalError("회원 탈퇴 중 문제가 발생했습니다."));
         }
     }
+
+    @PatchMapping(
+            value = "/me/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ApiResponse<?>> uploadProfileImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestPart("image") MultipartFile image
+    ) {
+        int userId = userDetails.getUser().getUserId();
+        String url = userService.updateProfileImage(userId, image);
+        return ResponseEntity.ok(ApiResponse.ok(url));
+    }
+
 }

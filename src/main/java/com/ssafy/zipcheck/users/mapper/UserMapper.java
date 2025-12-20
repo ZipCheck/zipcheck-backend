@@ -8,32 +8,39 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
 
-    MyInfoResponse findMyInfo(Integer userId);
+    MyInfoResponse findMyInfo(@Param("userId") Integer userId);
 
-    User findById(Integer userId);
+    User findById(@Param("userId") Integer userId);
 
-    String getPassword(Integer userId);
+    User findByEmail(@Param("email") String email);
 
-    int updateProfile(@Param("userId") Integer userId,
-                      @Param("nickname") String nickname,
-                      @Param("profileImage") String profileImage);
+    String getPassword(@Param("userId") Integer userId);
 
-    int updatePassword(@Param("userId") Integer userId,
-                       @Param("encodedPassword") String encodedPassword);
+    int updateProfile(
+            @Param("userId") Integer userId,
+            @Param("nickname") String nickname,
+            @Param("profileImageUrl") String profileImageUrl
+    );
 
-    int updateAlarmSetting(@Param("userId") Integer userId,
-                           @Param("agree") Boolean agree);
+    int updatePassword(
+            @Param("userId") Integer userId,
+            @Param("encodedPassword") String encodedPassword
+    );
 
-    int insertAlarmSetting(@Param("userId") Integer userId,
-                           @Param("agree") Boolean agree);
+    int updatePasswordByEmail(
+            @Param("email") String email,
+            @Param("encodedPassword") String encodedPassword
+    );
 
-    int deleteUser(Integer userId);
+    int updateAlarmSetting(
+            @Param("userId") Integer userId,
+            @Param("agree") Boolean agree
+    );
 
-    int updatePasswordByEmail(@Param("email") String email,
-                              @Param("encodedPassword") String encodedPassword);
+    int insertAlarmSetting(
+            @Param("userId") Integer userId,
+            @Param("agree") Boolean agree
+    );
 
-    User findByEmail(String email);
-
+    int deleteUser(@Param("userId") Integer userId);
 }
-
-
