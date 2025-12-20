@@ -89,9 +89,17 @@ public class AuthController {
             return ResponseEntity.ok(ApiResponse.ok(loginResponse));
 
         } catch (IllegalArgumentException e) {
+
             log.warn("[POST /auth/login] 로그인 실패: {}", e.getMessage());
+
+            if ("비활성화된 계정입니다.".equals(e.getMessage())) {
+                return ResponseEntity.status(403)
+                        .body(ApiResponse.forbidden("탈퇴한 계정입니다."));
+            }
+
             return ResponseEntity.badRequest()
                     .body(ApiResponse.invalid("이메일 또는 비밀번호가 올바르지 않습니다."));
+
         } catch (Exception e) {
             log.error("[POST /auth/login] 서버 오류: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError()

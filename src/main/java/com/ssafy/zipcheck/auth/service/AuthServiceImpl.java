@@ -43,12 +43,12 @@ public class AuthServiceImpl implements AuthService {
         User user = authMapper.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
-        if (!encoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
-        }
-
         if (user.getStatus() == 0) {
             throw new IllegalArgumentException("비활성화된 계정입니다.");
+        }
+
+        if (!encoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         return user;
