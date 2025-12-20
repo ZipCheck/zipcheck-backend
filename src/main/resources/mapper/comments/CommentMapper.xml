@@ -10,7 +10,12 @@
         SELECT
             c.comment_id,
             c.content,
-            u.nickname,
+
+            CASE
+                WHEN u.status = 0 THEN '탈퇴한 사용자'
+                ELSE u.nickname
+                END AS nickname,
+
             DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') AS createdAt
         FROM comments c
                  JOIN users u ON c.user_id = u.user_id

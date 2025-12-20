@@ -53,8 +53,14 @@
     </insert>
 
     <update id="deleteUser">
-        UPDATE users SET status = 0 WHERE user_id = #{userId}
+        UPDATE users
+        SET
+            status = 0,
+            nickname = CONCAT('탈퇴한 사용자#', user_id),
+            profile_image = NULL
+        WHERE user_id = #{userId}
     </update>
+
 
     <select id="findByEmail" resultType="com.ssafy.zipcheck.users.vo.User">
         SELECT * FROM users WHERE email = #{email}
