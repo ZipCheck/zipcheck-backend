@@ -63,6 +63,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
 
+                // CORS preflight 허용 (중요)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 // 프로필 이미지 조회 (공개)
                 .requestMatchers(HttpMethod.GET, "/users/*/profile-image")
                 .permitAll()
@@ -104,6 +107,7 @@ public class SecurityConfig {
 
                 .anyRequest().authenticated()
         );
+
 
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
