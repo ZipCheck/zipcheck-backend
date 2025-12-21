@@ -2,6 +2,7 @@ package com.ssafy.zipcheck.deals.controller;
 
 import com.ssafy.zipcheck.deals.dto.MapDealResponse;
 import com.ssafy.zipcheck.deals.dto.MapSearchRequest;
+import com.ssafy.zipcheck.deals.dto.MapSearchResponse;
 import com.ssafy.zipcheck.deals.service.MapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class MapController {
     private final MapService mapService;
 
     @PostMapping("/search")
-    public ResponseEntity<List<MapDealResponse>> searchHouseDeals(@RequestBody MapSearchRequest request) {
-        List<MapDealResponse> deals = mapService.searchHouseDeals(request);
+    public ResponseEntity<MapSearchResponse<?>> searchHouseDeals(@RequestBody MapSearchRequest request) {
+        MapSearchResponse<?> deals = mapService.searchHouseDeals(request);
         return ResponseEntity.ok(deals);
     }
 
