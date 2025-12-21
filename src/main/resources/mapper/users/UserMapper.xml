@@ -46,21 +46,24 @@
     </select>
 
     <!-- ========================================================= -->
-    <!-- 프로필 수정 -->
-    <!-- ========================================================= -->
-    <update id="updateProfile">
+    <!-- 닉네임 수정 -->
+    <update id="updateNickname">
         UPDATE users
-        <set>
-            <if test="nickname != null">
-                nickname = #{nickname},
-            </if>
-            <if test="profileImageUrl != null">
-                profile_image_url = #{profileImageUrl},
-            </if>
+        SET
+            nickname = #{nickname},
             updated_at = NOW()
-        </set>
         WHERE user_id = #{userId}
     </update>
+
+    <!-- 프로필 이미지 수정 -->
+    <update id="updateProfileImage">
+        UPDATE users
+        SET
+            profile_image_url = #{profileImageUrl},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
 
     <!-- ========================================================= -->
     <!-- 비밀번호 변경 (로그인 상태) -->
