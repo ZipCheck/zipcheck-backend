@@ -2,11 +2,12 @@ package com.ssafy.zipcheck.deals.service;
 
 import com.ssafy.zipcheck.deals.dto.MapDealResponse;
 import com.ssafy.zipcheck.deals.dto.MapSearchRequest;
+import com.ssafy.zipcheck.deals.dto.MapSearchResponse;
 
 import java.util.List;
 
 public interface MapService {
-    List<MapDealResponse> searchHouseDeals(MapSearchRequest request);
+    MapSearchResponse<?> searchHouseDeals(MapSearchRequest request);
     MapDealResponse getDealById(long id);
     List<String> getSidoNames();
     List<String> getGugunNames(String sidoName);
