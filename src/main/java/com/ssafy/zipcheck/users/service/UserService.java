@@ -23,34 +23,70 @@ public class UserService {
 
     public MyInfoResponse getMyInfo(int userId) {
         MyInfoResponse info = userMapper.findMyInfo(userId);
-        if (info == null) throw new IllegalArgumentException("사용자 없음");
+        if (info == null) {
+            throw new IllegalArgumentException("사용자 없음");
+        }
         return info;
     }
 
+    /* =========================
+       닉네임 수정 (안전)
+       ========================= */
     public void updateProfile(int userId, UpdateProfileRequest req) {
-        userMapper.updateProfile(userId, req.getNickname(), req.getProfileImageUrl());
+        if (req == null) return;
+
+        String nickname = req.getNickname();
+        if (nickname == null || nickname.isBlank()) {
+            return; // 닉네임 수정 의도 없음
+        }
+
+        userMapper.updateNickname(userId, nickname);
     }
 
+    /* =========================
+       프로필 이미지 업로드 / 삭제
+       ========================= */
     public String updateProfileImage(int userId, MultipartFile image) {
+
+        // 사진 삭제
+        if (image == null || image.isEmpty()) {
+            userMapper.updateProfileImage(userId, null);
+            return null;
+        }
+
+        // 사진 업로드
         String imageUrl = s3UploaderService.uploadProfileImage(image, userId);
-        userMapper.updateProfile(userId, null, imageUrl);
+        userMapper.updateProfileImage(userId, imageUrl);
         return imageUrl;
     }
 
+    /* =========================
+       비밀번호 수정
+       ========================= */
     public void updatePassword(int userId, UpdatePasswordRequest req) {
         String current = userMapper.getPassword(userId);
         if (!passwordEncoder.matches(req.getCurrentPassword(), current)) {
             throw new IllegalArgumentException("현재 비밀번호 불일치");
         }
-        userMapper.updatePassword(userId, passwordEncoder.encode(req.getNewPassword()));
+
+        userMapper.updatePassword(
+                userId,
+                passwordEncoder.encode(req.getNewPassword())
+        );
     }
 
+    /* =========================
+       알림 설정
+       ========================= */
     public void updateAlarm(int userId, Boolean agree) {
         if (userMapper.updateAlarmSetting(userId, agree) == 0) {
             userMapper.insertAlarmSetting(userId, agree);
         }
     }
 
+    /* =========================
+       회원 탈퇴
+       ========================= */
     public void deleteUser(int userId) {
         User user = userMapper.findById(userId);
         userMapper.deleteUser(userId);

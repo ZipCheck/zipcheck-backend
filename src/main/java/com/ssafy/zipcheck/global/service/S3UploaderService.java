@@ -31,8 +31,7 @@ public class S3UploaderService {
                     .bucket(bucket)
                     .key(fileName)
                     .contentType(file.getContentType())
-                    .acl("public-read")
-                    .build();
+                    .build(); // acl 제거
 
             s3Client.putObject(
                     request,
@@ -43,7 +42,10 @@ public class S3UploaderService {
             throw new IllegalStateException("S3 업로드 실패", e);
         }
 
-        return getFileUrl(fileName);
+        // AWS SDK가 보장하는 URL 생성 방식
+        return s3Client.utilities()
+                .getUrl(builder -> builder.bucket(bucket).key(fileName))
+                .toExternalForm();
     }
 
     private void validateImage(MultipartFile file) {
@@ -53,7 +55,8 @@ public class S3UploaderService {
         if (file.getSize() > 5_000_000) {
             throw new IllegalArgumentException("이미지는 5MB 이하만 가능합니다.");
         }
-        if (!file.getContentType().startsWith("image/")) {
+        if (file.getContentType() == null ||
+                !file.getContentType().startsWith("image/")) {
             throw new IllegalArgumentException("이미지 파일만 업로드 가능합니다.");
         }
     }
@@ -61,9 +64,5 @@ public class S3UploaderService {
     private String createFileName(Integer userId, String originalFilename) {
         String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
         return "profile/" + userId + "/" + UUID.randomUUID() + ext;
-    }
-
-    private String getFileUrl(String key) {
-        return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;
     }
 }

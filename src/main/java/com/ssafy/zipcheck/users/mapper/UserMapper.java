@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
 
+    /* =========================
+       조회
+       ========================= */
     MyInfoResponse findMyInfo(@Param("userId") Integer userId);
 
     User findById(@Param("userId") Integer userId);
@@ -16,12 +19,25 @@ public interface UserMapper {
 
     String getPassword(@Param("userId") Integer userId);
 
-    int updateProfile(
+    /* =========================
+       프로필 수정
+       ========================= */
+
+    // 닉네임만 수정
+    int updateNickname(
             @Param("userId") Integer userId,
-            @Param("nickname") String nickname,
+            @Param("nickname") String nickname
+    );
+
+    // 프로필 이미지 URL만 수정
+    int updateProfileImage(
+            @Param("userId") Integer userId,
             @Param("profileImageUrl") String profileImageUrl
     );
 
+    /* =========================
+       비밀번호
+       ========================= */
     int updatePassword(
             @Param("userId") Integer userId,
             @Param("encodedPassword") String encodedPassword
@@ -32,6 +48,9 @@ public interface UserMapper {
             @Param("encodedPassword") String encodedPassword
     );
 
+    /* =========================
+       알림 설정
+       ========================= */
     int updateAlarmSetting(
             @Param("userId") Integer userId,
             @Param("agree") Boolean agree
@@ -42,5 +61,8 @@ public interface UserMapper {
             @Param("agree") Boolean agree
     );
 
+    /* =========================
+       회원 탈퇴
+       ========================= */
     int deleteUser(@Param("userId") Integer userId);
 }
