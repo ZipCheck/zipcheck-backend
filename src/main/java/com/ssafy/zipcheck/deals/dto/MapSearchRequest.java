@@ -19,4 +19,5 @@ public class MapSearchRequest {
     private Integer zoomLevel;
     private Integer page;
     private Integer size;
+    private String aptSeq; // aptSeq 필드 타입 변경 (Long -> String)
 }

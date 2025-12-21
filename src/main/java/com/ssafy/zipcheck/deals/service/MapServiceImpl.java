@@ -1,5 +1,6 @@
 package com.ssafy.zipcheck.deals.service;
 
+import com.ssafy.zipcheck.deals.dto.MapApartmentResponse;
 import com.ssafy.zipcheck.deals.dto.MapClusterResponse;
 import com.ssafy.zipcheck.deals.dto.MapDealResponse;
 import com.ssafy.zipcheck.deals.dto.MapSearchRequest;
@@ -41,13 +42,14 @@ public class MapServiceImpl implements MapService {
                     .totalPages(1)
                     .build();
         } else {
-            List<MapDealResponse> deals = mapMapper.searchHouseDeals(request);
-            Long totalCount = mapMapper.countSearchHouseDeals(request);
+            // Grouped by Apartment Complex (instead of individual deals)
+            List<MapApartmentResponse> apartments = mapMapper.searchHouseGroupedByApt(request);
+            Long totalCount = mapMapper.countHouseGroupedByApt(request);
             
             int totalPages = (int) Math.ceil((double) totalCount / size);
 
-            return MapSearchResponse.<MapDealResponse>builder()
-                    .data(deals)
+            return MapSearchResponse.<MapApartmentResponse>builder()
+                    .data(apartments)
                     .totalCount(totalCount)
                     .currentPage(page) 
                     .totalPages(totalPages)
@@ -58,6 +60,30 @@ public class MapServiceImpl implements MapService {
     @Override
     public MapDealResponse getDealById(long id) {
         return mapMapper.getDealById(id);
+    }
+
+    @Override
+    public MapSearchResponse<MapDealResponse> getDealsByApartmentSeq(MapSearchRequest request) {
+        // Handle nulls for page and size with defaults
+        int page = request.getPage() != null ? request.getPage() : 1;
+        int size = request.getSize() != null ? request.getSize() : 20;
+        request.setSize(size);
+
+        // Calculate offset for pagination
+        int offset = (page - 1) * size;
+        request.setPage(offset); // Temporarily store offset in page field for mapper use
+
+        List<MapDealResponse> deals = mapMapper.searchHouseDealsByApartmentSeq(request); // New mapper method
+        Long totalCount = mapMapper.countHouseDealsByApartmentSeq(request); // New mapper method
+
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        return MapSearchResponse.<MapDealResponse>builder()
+                .data(deals)
+                .totalCount(totalCount)
+                .currentPage(page)
+                .totalPages(totalPages)
+                .build();
     }
 
     @Override

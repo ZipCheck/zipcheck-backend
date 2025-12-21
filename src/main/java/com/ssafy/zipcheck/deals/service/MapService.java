@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface MapService {
     MapSearchResponse<?> searchHouseDeals(MapSearchRequest request);
+    MapSearchResponse<MapDealResponse> getDealsByApartmentSeq(MapSearchRequest request);
     MapDealResponse getDealById(long id);
     List<String> getSidoNames();
     List<String> getGugunNames(String sidoName);
