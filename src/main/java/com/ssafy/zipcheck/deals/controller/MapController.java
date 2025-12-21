@@ -46,4 +46,17 @@ public class MapController {
         MapDealResponse deal = mapService.getDealById(id);
         return ResponseEntity.ok(deal);
     }
+
+    @GetMapping("/apartment/{aptSeq}/deals")
+    public ResponseEntity<MapSearchResponse<MapDealResponse>> getDealsByApartmentSeq(
+            @PathVariable String aptSeq,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer size) {
+        MapSearchRequest request = new MapSearchRequest();
+        request.setAptSeq(aptSeq); // Set aptSeq in request
+        request.setPage(page);
+        request.setSize(size);
+        MapSearchResponse<MapDealResponse> deals = mapService.getDealsByApartmentSeq(request);
+        return ResponseEntity.ok(deals);
+    }
 }
