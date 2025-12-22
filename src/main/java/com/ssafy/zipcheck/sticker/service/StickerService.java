@@ -8,5 +8,6 @@ import java.util.List;
 public interface StickerService {
     void createSticker(Integer userId, StickerCreateRequest request);
     List<StickerResponse> getStickersByDealId(long dealId);
+    List<StickerResponse> getStickersByAptSeq(String aptSeq); // New method
     void deleteSticker(Integer userId, long stickerId);
 }

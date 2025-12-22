@@ -12,12 +12,12 @@ public class MapSearchRequest {
     private Double maxArea;
     private Long minPrice;
     private Long maxPrice;
-
-    // Pagination
-    private int page = 1;  // 기본 페이지 번호
-    private int size = 20; // 페이지당 기본 데이터 개수
-
-    public int getOffset() {
-        return (page > 0) ? (page - 1) * size : 0;
-    }
+    private Double minLatitude;
+    private Double maxLatitude;
+    private Double minLongitude;
+    private Double maxLongitude;
+    private Integer zoomLevel;
+    private Integer page;
+    private Integer size;
+    private String aptSeq; // aptSeq 필드 타입 변경 (Long -> String)
 }

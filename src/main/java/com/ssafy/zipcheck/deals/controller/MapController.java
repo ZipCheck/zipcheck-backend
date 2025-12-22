@@ -2,6 +2,7 @@ package com.ssafy.zipcheck.deals.controller;
 
 import com.ssafy.zipcheck.deals.dto.MapDealResponse;
 import com.ssafy.zipcheck.deals.dto.MapSearchRequest;
+import com.ssafy.zipcheck.deals.dto.MapSearchResponse;
 import com.ssafy.zipcheck.deals.service.MapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class MapController {
     private final MapService mapService;
 
     @PostMapping("/search")
-    public ResponseEntity<List<MapDealResponse>> searchHouseDeals(@RequestBody MapSearchRequest request) {
-        List<MapDealResponse> deals = mapService.searchHouseDeals(request);
+    public ResponseEntity<MapSearchResponse<?>> searchHouseDeals(@RequestBody MapSearchRequest request) {
+        MapSearchResponse<?> deals = mapService.searchHouseDeals(request);
         return ResponseEntity.ok(deals);
     }
 
@@ -44,5 +45,18 @@ public class MapController {
     public ResponseEntity<MapDealResponse> getDealById(@PathVariable long id) {
         MapDealResponse deal = mapService.getDealById(id);
         return ResponseEntity.ok(deal);
+    }
+
+    @GetMapping("/apartment/{aptSeq}/deals")
+    public ResponseEntity<MapSearchResponse<MapDealResponse>> getDealsByApartmentSeq(
+            @PathVariable String aptSeq,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer size) {
+        MapSearchRequest request = new MapSearchRequest();
+        request.setAptSeq(aptSeq); // Set aptSeq in request
+        request.setPage(page);
+        request.setSize(size);
+        MapSearchResponse<MapDealResponse> deals = mapService.getDealsByApartmentSeq(request);
+        return ResponseEntity.ok(deals);
     }
 }
