@@ -14,7 +14,8 @@ public interface MapMapper {
     List<MapApartmentResponse> searchHouseGroupedByApt(MapSearchRequest request);
     Long countHouseGroupedByApt(MapSearchRequest request);
     List<MapDealResponse> searchHouseDealsByApartmentSeq(MapSearchRequest request); // New method
-    Long countHouseDealsByApartmentSeq(MapSearchRequest request); // New method
+    Long countHouseDealsByApartmentSeq(MapSearchRequest request);
+    List<Long> findDealIdsByAptSeq(String aptSeq); // New method to find all dealIds for an aptSeq
     List<MapClusterResponse> searchHouseClusters(MapSearchRequest request);
     Long countSearchHouseDeals(MapSearchRequest request);
     MapDealResponse getDealById(long id);

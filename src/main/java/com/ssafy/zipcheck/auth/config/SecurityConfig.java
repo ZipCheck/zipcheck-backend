@@ -127,6 +127,7 @@ public class SecurityConfig {
                 // =========================
                 .requestMatchers(HttpMethod.POST, "/api/ai/index-reviews").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ai/deals/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/ai/apartments/**").permitAll() // 추가된 설정
 
                 .anyRequest().authenticated()
         );

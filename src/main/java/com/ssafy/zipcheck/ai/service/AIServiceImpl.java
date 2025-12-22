@@ -24,19 +24,38 @@ public class AIServiceImpl implements AIService {
     private final StickerService stickerService;
 
     @Override
-    public ChatbotResponseDto getSummaryOfStickers(Long dealId) {
-        log.info("Requesting sticker summary for dealId: {}", dealId);
+    public ChatbotResponseDto getApartmentReport(String aptSeq) {
+        log.info("Requesting AI report for aptSeq: {}", aptSeq);
 
-        String question = "이 매물에 대한 주민들의 스티커 리뷰들을 종합적으로 요약해줘.";
+        // 1. aptSeq에 해당하는 모든 스티커 데이터 조회
+        List<StickerResponse> stickers = stickerService.getStickersByAptSeq(aptSeq);
 
-        // Python AI 서버의 "POST /api/deals/{deal_id}/chatbot" 엔드포인트 호출
+        // 2. DTO로 변환
+        List<StickerDataDto> stickerDataDtos = stickers.stream()
+                .map(sticker -> StickerDataDto.builder()
+                        .stickerId(sticker.getStickerId())
+                        .description(sticker.getDescription())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 3. AI 서버에 보낼 질문 및 데이터 구성
+        String question = aptSeq + " 아파트 단지에 대한 주민들의 스티커 리뷰들을 종합적으로 요약하고, 전반적인 거주 환경에 대한 보고서를 작성해줘.";
+        
+        Map<String, Object> requestBody = Map.of(
+            "apt_seq", aptSeq,
+            "question", question,
+            "stickers", stickerDataDtos
+        );
+
+        // Python AI 서버의 새로운 엔드포인트 호출 (예: /api/apartments/{apt_seq}/chatbot)
+        // 여기서는 임시로 /api/chatbot 으로 보내고 apt_seq를 body에 포함
         return webClient.post()
-                .uri("/api/deals/" + dealId + "/chatbot")
-                .body(Mono.just(Map.of("question", question)), Map.class)
+                .uri("/api/apartments/" + aptSeq + "/chatbot") // AI 서버의 새로운 엔드포인트
+                .body(Mono.just(requestBody), Map.class)
                 .retrieve()
                 .bodyToMono(ChatbotResponseDto.class)
-                .doOnSuccess(response -> log.info("Successfully summarized stickers for dealId {}: {}", dealId, response))
-                .doOnError(error -> log.error("Error while summarizing stickers for dealId {}: {}", dealId, error.getMessage()))
+                .doOnSuccess(response -> log.info("Successfully received AI report for aptSeq {}: {}", aptSeq, response))
+                .doOnError(error -> log.error("Error while getting AI report for aptSeq {}: {}", aptSeq, error.getMessage()))
                 .block();
     }
 
