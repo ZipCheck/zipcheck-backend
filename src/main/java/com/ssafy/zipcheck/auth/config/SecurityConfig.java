@@ -108,6 +108,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/ai/index-reviews").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ai/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ai/apartments/**").permitAll() // 추가된 설정
+                // 지도
+                .requestMatchers("/zipcheck/map/**")
+                .permitAll()
+
                 // 마이페이지
                 .requestMatchers("/users/**")
                 .hasAnyRole("USER", "ADMIN")
