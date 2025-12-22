@@ -1,5 +1,6 @@
 package com.ssafy.zipcheck.deals.controller;
 
+import com.ssafy.zipcheck.auth.domain.CustomUserDetails;
 import com.ssafy.zipcheck.deals.dto.MapDealResponse;
 import com.ssafy.zipcheck.deals.dto.MapSearchRequest;
 import com.ssafy.zipcheck.deals.dto.MapSearchResponse;
@@ -7,6 +8,7 @@ import com.ssafy.zipcheck.deals.service.MapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -49,14 +51,26 @@ public class MapController {
 
     @GetMapping("/apartment/{aptSeq}/deals")
     public ResponseEntity<MapSearchResponse<MapDealResponse>> getDealsByApartmentSeq(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String aptSeq,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
+
+        Integer userId = (userDetails != null)
+                ? userDetails.getUser().getUserId()
+                : null;
+
         MapSearchRequest request = new MapSearchRequest();
-        request.setAptSeq(aptSeq); // Set aptSeq in request
+        request.setAptSeq(aptSeq);
         request.setPage(page);
         request.setSize(size);
-        MapSearchResponse<MapDealResponse> deals = mapService.getDealsByApartmentSeq(request);
+
+        //  userId 주입
+        request.setUserId(userId);
+
+        MapSearchResponse<MapDealResponse> deals =
+                mapService.getDealsByApartmentSeq(request);
+
         return ResponseEntity.ok(deals);
     }
 }

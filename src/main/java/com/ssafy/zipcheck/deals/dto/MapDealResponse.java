@@ -1,11 +1,11 @@
 package com.ssafy.zipcheck.deals.dto;
 
 import lombok.Data;
-
 import java.math.BigDecimal;
 
 @Data
 public class MapDealResponse {
+
     private int no;
     private String aptSeq;
     private String aptDong;
@@ -21,4 +21,7 @@ public class MapDealResponse {
     private String buildYear;
     private String latitude;
     private String longitude;
+
+    //  찜 여부 추가
+    private Boolean isFavorite;
 }
