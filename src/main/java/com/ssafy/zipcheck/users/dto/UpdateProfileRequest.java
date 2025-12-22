@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class UpdateProfileRequest {
     private String nickname;
-    private String profileImage;
 }

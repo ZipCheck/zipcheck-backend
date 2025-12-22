@@ -17,12 +17,15 @@ public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeMapper noticeMapper;
 
+    // 공지 목록
     @Override
-    public List<NoticeResponse> getNotices() {
-        return noticeMapper.findAll();
+    public List<NoticeListResponse> getNotices(String category) {
+        return noticeMapper.findAll(category);
     }
 
+    // 공지 상세
     @Override
+    @Transactional
     public NoticeResponse getNotice(int noticeId) {
         noticeMapper.incrementHit(noticeId);
 
@@ -35,7 +38,12 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public void createNotice(int userId, NoticeCreateRequest request) {
-        noticeMapper.insert(userId, request.getTitle(), request.getContent());
+        noticeMapper.insert(
+                userId,
+                request.getTitle(),
+                request.getCategory(),
+                request.getContent()
+        );
     }
 
     @Override
@@ -43,6 +51,7 @@ public class NoticeServiceImpl implements NoticeService {
         int updated = noticeMapper.update(
                 noticeId,
                 request.getTitle(),
+                request.getCategory(),
                 request.getContent()
         );
 
@@ -59,4 +68,3 @@ public class NoticeServiceImpl implements NoticeService {
         }
     }
 }
-

@@ -5,45 +5,94 @@
 
 <mapper namespace="com.ssafy.zipcheck.users.mapper.UserMapper">
 
+    <!-- ========================================================= -->
     <!-- 내 정보 조회 -->
+    <!-- ========================================================= -->
     <select id="findMyInfo" resultType="com.ssafy.zipcheck.users.dto.MyInfoResponse">
         SELECT
             u.user_id AS userId,
             u.email,
             u.nickname,
-            u.profile_image AS profileImage,
-            u.created_at,
+            u.profile_image_url AS profileImageUrl,
+            u.created_at AS createdAt,
             a.agree AS alarmAgree
         FROM users u
                  LEFT JOIN alarm a ON u.user_id = a.users_user_id
         WHERE u.user_id = #{userId}
     </select>
 
+    <!-- ========================================================= -->
+    <!-- 사용자 조회 -->
+    <!-- ========================================================= -->
     <select id="findById" resultType="com.ssafy.zipcheck.users.vo.User">
-        SELECT * FROM users WHERE user_id = #{userId}
+        SELECT *
+        FROM users
+        WHERE user_id = #{userId}
     </select>
 
+    <select id="findByEmail" resultType="com.ssafy.zipcheck.users.vo.User">
+        SELECT *
+        FROM users
+        WHERE email = #{email}
+    </select>
+
+    <!-- ========================================================= -->
+    <!-- 비밀번호 조회 -->
+    <!-- ========================================================= -->
     <select id="getPassword" resultType="string">
-        SELECT password FROM users WHERE user_id = #{userId}
+        SELECT password
+        FROM users
+        WHERE user_id = #{userId}
     </select>
 
-    <update id="updateProfile">
+    <!-- ========================================================= -->
+    <!-- 닉네임 수정 -->
+    <update id="updateNickname">
         UPDATE users
-        SET nickname = #{nickname},
-            profile_image = #{profileImage},
+        SET
+            nickname = #{nickname},
             updated_at = NOW()
         WHERE user_id = #{userId}
     </update>
 
+    <!-- 프로필 이미지 수정 -->
+    <update id="updateProfileImage">
+        UPDATE users
+        SET
+            profile_image_url = #{profileImageUrl},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+
+    <!-- ========================================================= -->
+    <!-- 비밀번호 변경 (로그인 상태) -->
+    <!-- ========================================================= -->
     <update id="updatePassword">
         UPDATE users
-        SET password = #{encodedPassword},
+        SET
+            password = #{encodedPassword},
             updated_at = NOW()
         WHERE user_id = #{userId}
     </update>
 
+    <!-- ========================================================= -->
+    <!-- 비밀번호 초기화 (이메일 기준) -->
+    <!-- ========================================================= -->
+    <update id="updatePasswordByEmail">
+        UPDATE users
+        SET
+            password = #{encodedPassword},
+            updated_at = NOW()
+        WHERE email = #{email}
+    </update>
+
+    <!-- ========================================================= -->
+    <!-- 알림 설정 -->
+    <!-- ========================================================= -->
     <update id="updateAlarmSetting">
-        UPDATE alarm SET agree = #{agree}
+        UPDATE alarm
+        SET agree = #{agree}
         WHERE users_user_id = #{userId}
     </update>
 
@@ -52,19 +101,17 @@
         VALUES (#{userId}, #{agree})
     </insert>
 
+    <!-- ========================================================= -->
+    <!-- 회원 탈퇴 -->
+    <!-- ========================================================= -->
     <update id="deleteUser">
-        UPDATE users SET status = 0 WHERE user_id = #{userId}
-    </update>
-
-    <select id="findByEmail" resultType="com.ssafy.zipcheck.users.vo.User">
-        SELECT * FROM users WHERE email = #{email}
-    </select>
-
-    <update id="updatePasswordByEmail">
         UPDATE users
-        SET password = #{encodedPassword},
+        SET
+            status = 0,
+            nickname = CONCAT('탈퇴한 사용자#', user_id),
+            profile_image_url = NULL,
             updated_at = NOW()
-        WHERE email = #{email}
+        WHERE user_id = #{userId}
     </update>
 
 </mapper>
