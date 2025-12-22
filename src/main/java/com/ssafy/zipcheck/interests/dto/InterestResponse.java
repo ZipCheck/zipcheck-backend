@@ -2,12 +2,15 @@ package com.ssafy.zipcheck.interests.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class InterestResponse {
-    // From interests table
-    private Integer interestId;
 
-    // From houseinfos table
+    private Integer interestId;
+    private Integer dealNo;
+
+    // houseinfos
     private String aptSeq;
     private String aptName;
     private String jibun;
@@ -16,8 +19,7 @@ public class InterestResponse {
     private Double latitude;
     private Double longitude;
 
-    // From housedeals table
-    private Integer no; // deal number
+    // housedeals
     private String aptDong;
     private String floor;
     private Integer dealYear;
@@ -25,4 +27,8 @@ public class InterestResponse {
     private Integer dealDay;
     private Double excluUseAr;
     private String dealAmount;
+
+    // UI 확장
+    private LocalDateTime createdAt;
+    private Boolean hasSticker;
 }

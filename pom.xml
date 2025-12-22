@@ -22,7 +22,7 @@
     </properties>
 
     <!-- ===============================
-         AWS SDK v2 BOM (★핵심★)
+         AWS SDK v2 BOM
          =============================== -->
     <dependencyManagement>
         <dependencies>
@@ -37,7 +37,11 @@
     </dependencyManagement>
 
     <dependencies>
-
+        <!-- WebClient를 사용하기 위한 spring-boot-starter-webflux 의존성 추가 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
         <!-- Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
