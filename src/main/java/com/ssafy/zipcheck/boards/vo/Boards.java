@@ -3,17 +3,30 @@ package com.ssafy.zipcheck.boards.vo;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Boards {
-    private int boardId;            // PK
-    private String title;           // 제목
-    private String content;         // 내용
-    private int hit;                // 조회수
-    private LocalDateTime createdAt; // 생성 시간
-    private LocalDateTime updatedAt; // 수정 시간
-    private int userId;             // 작성자 users.user_id
-    private boolean visible;        // 공개 여부
-    private int likeCount;          // 좋아요 개수
+
+    private int boardId;
+    private String title;
+    private String category;
+    private String content;
+    private int hit;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private int userId;
+    private boolean visible;
+
+    private int likeCount;
+    private int commentCount;
+    private boolean isLiked;
+
     private String nickname;
-    private boolean isLiked;  // 현재 로그인 유저가 좋아요 눌렀는가
+    private String profileImageUrl;
 }
+

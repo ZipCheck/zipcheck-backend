@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface NoticeService {
 
-    List<NoticeResponse> getNotices();
+    List<NoticeListResponse> getNotices(String category);
 
     NoticeResponse getNotice(int noticeId);
 
@@ -19,4 +19,3 @@ public interface NoticeService {
 
     void deleteNotice(int noticeId);
 }
-

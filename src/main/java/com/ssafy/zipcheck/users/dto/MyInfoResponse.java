@@ -13,7 +13,7 @@ public class MyInfoResponse {
     private Integer userId;
     private String email;
     private String nickname;
-    private String profileImage;
+    private String profileImageUrl;
     private Boolean alarmAgree;
     private LocalDateTime createdAt;
 }

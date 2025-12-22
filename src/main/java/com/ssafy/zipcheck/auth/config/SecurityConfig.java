@@ -37,18 +37,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.cors((cors) -> cors.configurationSource(new CorsConfigurationSource() {
+        http.cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                configuration.setAllowedOrigins(
+                        Collections.singletonList("http://localhost:3000")
+                );
                 configuration.setAllowedMethods(Collections.singletonList("*"));
-                configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
+                configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L);
-
-                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                configuration.setExposedHeaders(
+                        Collections.singletonList("Authorization")
+                );
 
                 return configuration;
             }
@@ -60,59 +63,36 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
 
-                // =========================
+                // CORS preflight 허용 (중요)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // 프로필 이미지 조회 (공개)
+                .requestMatchers(HttpMethod.GET, "/users/*/profile-image")
+                .permitAll()
+
+                // 파일 업로드
+                .requestMatchers(HttpMethod.POST, "/files/**")
+                .hasAnyRole("USER", "ADMIN")
+
                 // 공지사항
-                // =========================
                 .requestMatchers(HttpMethod.GET, "/notices", "/notices/**")
                 .permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/notices")
-                .hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.PUT, "/notices/**")
-                .hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.DELETE, "/notices/**")
-                .hasRole("ADMIN")
-
-                // =========================
                 // 게시글
-                // =========================
                 .requestMatchers(HttpMethod.GET, "/boards", "/boards/**")
                 .permitAll()
 
-                .requestMatchers(HttpMethod.POST,
-                        "/boards",
-                        "/boards/*/like"
-                ).hasAnyRole("USER", "ADMIN")
-
-                .requestMatchers(HttpMethod.PUT, "/boards/**")
+                .requestMatchers(HttpMethod.POST, "/boards", "/boards/*/like")
                 .hasAnyRole("USER", "ADMIN")
 
-                .requestMatchers(HttpMethod.DELETE, "/boards/**")
-                .hasAnyRole("USER", "ADMIN")
-
-                // =========================
                 // 댓글
-                // =========================
                 .requestMatchers(HttpMethod.GET, "/comments/**")
                 .permitAll()
 
                 .requestMatchers(HttpMethod.POST, "/comments")
                 .hasAnyRole("USER", "ADMIN")
 
-                .requestMatchers(HttpMethod.DELETE, "/comments/**")
-                .hasAnyRole("USER", "ADMIN")
-
-                // =========================
-                // 마이페이지
-                // =========================
-                .requestMatchers("/users/**")
-                .hasAnyRole("USER", "ADMIN")
-
-                // =========================
-                // 인증 관련
-                // =========================
+                // 인증
                 .requestMatchers(
                         "/auth/signup",
                         "/auth/login",
@@ -128,9 +108,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/ai/index-reviews").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ai/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ai/apartments/**").permitAll() // 추가된 설정
+                // 마이페이지
+                .requestMatchers("/users/**")
+                .hasAnyRole("USER", "ADMIN")
 
                 .anyRequest().authenticated()
         );
+
 
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

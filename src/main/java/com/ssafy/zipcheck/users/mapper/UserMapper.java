@@ -8,32 +8,61 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
 
-    MyInfoResponse findMyInfo(Integer userId);
+    /* =========================
+       조회
+       ========================= */
+    MyInfoResponse findMyInfo(@Param("userId") Integer userId);
 
-    User findById(Integer userId);
+    User findById(@Param("userId") Integer userId);
 
-    String getPassword(Integer userId);
+    User findByEmail(@Param("email") String email);
 
-    int updateProfile(@Param("userId") Integer userId,
-                      @Param("nickname") String nickname,
-                      @Param("profileImage") String profileImage);
+    String getPassword(@Param("userId") Integer userId);
 
-    int updatePassword(@Param("userId") Integer userId,
-                       @Param("encodedPassword") String encodedPassword);
+    /* =========================
+       프로필 수정
+       ========================= */
 
-    int updateAlarmSetting(@Param("userId") Integer userId,
-                           @Param("agree") Boolean agree);
+    // 닉네임만 수정
+    int updateNickname(
+            @Param("userId") Integer userId,
+            @Param("nickname") String nickname
+    );
 
-    int insertAlarmSetting(@Param("userId") Integer userId,
-                           @Param("agree") Boolean agree);
+    // 프로필 이미지 URL만 수정
+    int updateProfileImage(
+            @Param("userId") Integer userId,
+            @Param("profileImageUrl") String profileImageUrl
+    );
 
-    int deleteUser(Integer userId);
+    /* =========================
+       비밀번호
+       ========================= */
+    int updatePassword(
+            @Param("userId") Integer userId,
+            @Param("encodedPassword") String encodedPassword
+    );
 
-    int updatePasswordByEmail(@Param("email") String email,
-                              @Param("encodedPassword") String encodedPassword);
+    int updatePasswordByEmail(
+            @Param("email") String email,
+            @Param("encodedPassword") String encodedPassword
+    );
 
-    User findByEmail(String email);
+    /* =========================
+       알림 설정
+       ========================= */
+    int updateAlarmSetting(
+            @Param("userId") Integer userId,
+            @Param("agree") Boolean agree
+    );
 
+    int insertAlarmSetting(
+            @Param("userId") Integer userId,
+            @Param("agree") Boolean agree
+    );
+
+    /* =========================
+       회원 탈퇴
+       ========================= */
+    int deleteUser(@Param("userId") Integer userId);
 }
-
-

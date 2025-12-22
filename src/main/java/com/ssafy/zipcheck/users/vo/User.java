@@ -10,9 +10,9 @@ public class User {
     private String email;
     private String password;
     private String nickname;
-    private String profileImage;
+    private String profileImageUrl;
     private Integer status;
     private String role;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt; // 비밀번호 변경 일자
+    private LocalDateTime updatedAt;
 }

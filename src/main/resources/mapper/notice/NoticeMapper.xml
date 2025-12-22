@@ -5,58 +5,83 @@
 
 <mapper namespace="com.ssafy.zipcheck.notice.mapper.NoticeMapper">
 
+    <!-- ================================================= -->
     <!-- 공지사항 목록 -->
-    <select id="findAll" resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
+    <!-- ================================================= -->
+    <select id="findAll"
+            resultType="com.ssafy.zipcheck.notice.dto.NoticeListResponse">
         SELECT
-            n.board_id AS noticeId,
-            n.title,
-            u.nickname,
-            n.hit,
-            DATE_FORMAT(n.created_at, '%Y-%m-%d') AS createdAt
+        n.notice_id AS noticeId,
+        n.title,
+        n.category,
+        u.nickname,
+        n.hit,
+        n.created_at AS createdAt
         FROM notice n
-                 JOIN users u ON n.users_user_id = u.user_id
+        JOIN users u ON n.users_user_id = u.user_id
+
+        <where>
+            <if test="category != null">
+                n.category = #{category}
+            </if>
+        </where>
+
         ORDER BY n.created_at DESC
     </select>
 
+    <!-- ================================================= -->
     <!-- 공지사항 상세 -->
-    <select id="findById" resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
+    <!-- ================================================= -->
+    <select id="findById"
+            resultType="com.ssafy.zipcheck.notice.dto.NoticeResponse">
         SELECT
-            n.board_id AS noticeId,
+            n.notice_id AS noticeId,
             n.title,
+            n.category,
+            n.content,
             u.nickname,
             n.hit,
-            DATE_FORMAT(n.created_at, '%Y-%m-%d') AS createdAt
+            n.created_at AS createdAt
         FROM notice n
                  JOIN users u ON n.users_user_id = u.user_id
-        WHERE n.board_id = #{noticeId}
+        WHERE n.notice_id = #{noticeId}
     </select>
 
+    <!-- ================================================= -->
     <!-- 조회수 증가 -->
+    <!-- ================================================= -->
     <update id="incrementHit">
         UPDATE notice
         SET hit = hit + 1
-        WHERE board_id = #{noticeId}
+        WHERE notice_id = #{noticeId}
     </update>
 
+    <!-- ================================================= -->
     <!-- 등록 -->
+    <!-- ================================================= -->
     <insert id="insert">
-        INSERT INTO notice (title, content, users_user_id)
-        VALUES (#{title}, #{content}, #{userId})
+        INSERT INTO notice (title, category, content, users_user_id)
+        VALUES (#{title}, #{category}, #{content}, #{userId})
     </insert>
 
+    <!-- ================================================= -->
     <!-- 수정 -->
+    <!-- ================================================= -->
     <update id="update">
         UPDATE notice
         SET title = #{title},
+            category = #{category},
             content = #{content},
             updated_at = NOW()
-        WHERE board_id = #{noticeId}
+        WHERE notice_id = #{noticeId}
     </update>
 
+    <!-- ================================================= -->
     <!-- 삭제 -->
+    <!-- ================================================= -->
     <delete id="delete">
         DELETE FROM notice
-        WHERE board_id = #{noticeId}
+        WHERE notice_id = #{noticeId}
     </delete>
 
 </mapper>
