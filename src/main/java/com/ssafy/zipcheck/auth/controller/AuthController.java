@@ -32,6 +32,12 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignupRequest request) {
         try {
+            // 프로필 이미지 용량 최소 방어 (Base64 기준)
+            if (request.getProfileImage() != null &&
+                    request.getProfileImage().length() > 5_000_000) {
+                throw new IllegalArgumentException("프로필 이미지 용량 초과");
+            }
+
             authService.signup(request);
             return ResponseEntity.ok(ApiResponse.ok("회원가입 완료"));
 
