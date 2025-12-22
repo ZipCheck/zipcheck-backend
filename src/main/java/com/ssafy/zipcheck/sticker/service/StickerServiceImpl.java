@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.zipcheck.deals.mapper.MapMapper; // MapMapper import 추가
+
+import java.util.ArrayList; // ArrayList import 추가
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +20,8 @@ import java.util.Objects;
 public class StickerServiceImpl implements StickerService {
 
     private final StickerMapper stickerMapper;
-
+    private final MapMapper mapMapper; // MapMapper 주입
+    
     @Override
     @Transactional
     public void createSticker(Integer userId, StickerCreateRequest request) {
@@ -28,6 +32,16 @@ public class StickerServiceImpl implements StickerService {
     @Override
     public List<StickerResponse> getStickersByDealId(long dealId) {
         return stickerMapper.findStickersByDealId(dealId);
+    }
+
+    @Override
+    public List<StickerResponse> getStickersByAptSeq(String aptSeq) {
+        List<Long> dealIds = mapMapper.findDealIdsByAptSeq(aptSeq);
+        List<StickerResponse> allStickers = new ArrayList<>();
+        for (Long dealId : dealIds) {
+            allStickers.addAll(stickerMapper.findStickersByDealId(dealId));
+        }
+        return allStickers;
     }
 
     @Override

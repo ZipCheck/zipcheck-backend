@@ -19,14 +19,14 @@ public class AIController {
     private final AIService aiService;
     private final WebClient webClient; // For requestIndexing
 
-    @GetMapping("/deals/{dealId}/summary")
-    public ResponseEntity<ApiResponse<ChatbotResponseDto>> getStickerSummary(@PathVariable Long dealId) {
+    @GetMapping("/apartments/{aptSeq}/summary") // 엔드포인트 경로 변경 (report -> summary)
+    public ResponseEntity<ApiResponse<ChatbotResponseDto>> getApartmentAIReport(@PathVariable String aptSeq) {
         try {
-            ChatbotResponseDto response = aiService.getSummaryOfStickers(dealId);
+            ChatbotResponseDto response = aiService.getApartmentReport(aptSeq);
             return ResponseEntity.ok(ApiResponse.ok(response));
         } catch (Exception e) {
-            log.error("[GET /api/ai/deals/{}/summary] Error summarizing stickers: {}", dealId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(ApiResponse.internalError("스티커 요약 중 오류가 발생했습니다."));
+            log.error("[GET /api/ai/apartments/{}/summary] Error generating AI report: {}", aptSeq, e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(ApiResponse.internalError("아파트 AI 리포트 생성 중 오류가 발생했습니다."));
         }
     }
 

@@ -270,4 +270,10 @@
         <include refid="getApartmentDealsWhereClause"/>
     </select>
 
+    <select id="findDealIdsByAptSeq" parameterType="String" resultType="Long">
+        SELECT hd.no
+        FROM housedeals hd
+        WHERE hd.apt_seq = #{aptSeq}
+    </select>
+
 </mapper>
