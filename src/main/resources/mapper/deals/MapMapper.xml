@@ -22,6 +22,55 @@
         <result column="longitude" property="longitude"/>
     </resultMap>
 
+    <resultMap id="mapClusterResponseMap" type="com.ssafy.zipcheck.deals.dto.MapClusterResponse">
+        <result column="region_name" property="regionName"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="deal_count" property="dealCount"/>
+    </resultMap>
+
+    <resultMap id="mapApartmentResponseMap" type="com.ssafy.zipcheck.deals.dto.MapApartmentResponse">
+        <result column="apt_seq" property="aptSeq"/>
+        <result column="apt_nm" property="aptName"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="deal_count" property="dealCount"/>
+        <result column="recent_deal_amount" property="recentDealAmount"/>
+    </resultMap>
+
+    <sql id="searchWhereClause">
+        <where>
+            <if test="sidoName != null and !sidoName.isEmpty()">
+                AND dc.sido_name = #{sidoName}
+            </if>
+            <if test="gugunName != null and !gugunName.isEmpty()">
+                AND dc.gugun_name = #{gugunName}
+            </if>
+            <if test="dongName != null and !dongName.isEmpty()">
+                AND dc.dong_name = #{dongName}
+            </if>
+            <if test="aptName != null and !aptName.isEmpty()">
+                AND hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
+            </if>
+            <if test="minArea != null">
+                AND hd.exclu_use_ar &gt;= #{minArea}
+            </if>
+            <if test="maxArea != null">
+                AND hd.exclu_use_ar &lt;= #{maxArea}
+            </if>
+            <if test="minPrice != null">
+                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &lt;= #{maxPrice}
+            </if>
+            <if test="minLatitude != null and maxLatitude != null and minLongitude != null and maxLongitude != null">
+                AND hi.latitude BETWEEN #{minLatitude} AND #{maxLatitude}
+                AND hi.longitude BETWEEN #{minLongitude} AND #{maxLongitude}
+            </if>
+        </where>
+    </sql>
+
     <select id="searchHouseDeals" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultMap="houseDealResponseMap">
         SELECT
             hd.no,
@@ -45,35 +94,98 @@
                           AND dc.dong_name = hi.umd_nm
                  JOIN housedeals hd USE INDEX (idx_hd_apt_date)
                       ON hd.apt_seq = hi.apt_seq
-        <where>
-            <if test="sidoName != null and !sidoName.isEmpty()">
-                AND dc.sido_name = #{sidoName}
-            </if>
-            <if test="gugunName != null and !gugunName.isEmpty()">
-                AND dc.gugun_name = #{gugunName}
-            </if>
-            <if test="dongName != null and !dongName.isEmpty()">
-                AND dc.dong_name = #{dongName}
-            </if>
-            <if test="aptName != null and !aptName.isEmpty()">
-                AND hi.apt_nm LIKE CONCAT(#{aptName}, '%')
-            </if>
-            <if test="minArea != null">
-                AND hd.exclu_use_ar &gt;= #{minArea}
-            </if>
-            <if test="maxArea != null">
-                AND hd.exclu_use_ar &lt;= #{maxArea}
-            </if>
-            <if test="minPrice != null">
-                AND hd.deal_amount_num &gt;= #{minPrice}
-            </if>
-            <if test="maxPrice != null">
-                AND hd.deal_amount_num &lt;= #{maxPrice}
-            </if>
-        </where>
+        <include refid="searchWhereClause"/>
         ORDER BY hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
-        LIMIT #{size} OFFSET #{offset}
+        LIMIT #{size} OFFSET #{page}
     </select>
+
+    <select id="countSearchHouseDeals" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultType="Long">
+        SELECT
+            COUNT(hd.no)
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="searchWhereClause"/>
+    </select>
+
+    <select id="searchHouseGroupedByApt" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultMap="mapApartmentResponseMap">
+        SELECT
+            hi.apt_seq,
+            hi.apt_nm,
+            hi.latitude,
+            hi.longitude,
+            COUNT(hd.no) AS deal_count,
+            MAX(hd.deal_amount) AS recent_deal_amount
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="searchWhereClause"/>
+        GROUP BY hi.apt_seq
+        LIMIT #{size} OFFSET #{page}
+    </select>
+
+    <select id="countHouseGroupedByApt" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultType="Long">
+        SELECT
+            COUNT(DISTINCT hi.apt_seq)
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="searchWhereClause"/>
+    </select>
+
+    <select id="searchHouseClusters" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultMap="mapClusterResponseMap">
+        SELECT
+            <choose>
+                <when test="zoomLevel != null and zoomLevel &lt;= 7"> <!-- 시/도 레벨 (예시) -->
+                    dc.sido_name AS region_name,
+                    AVG(hi.latitude) AS latitude,
+                    AVG(hi.longitude) AS longitude,
+                    COUNT(hd.no) AS deal_count
+                </when>
+                <when test="zoomLevel != null and zoomLevel &lt;= 10"> <!-- 시/군/구 레벨 (예시) -->
+                    dc.gugun_name AS region_name,
+                    AVG(hi.latitude) AS latitude,
+                    AVG(hi.longitude) AS longitude,
+                    COUNT(hd.no) AS deal_count
+                </when>
+                <otherwise> <!-- 읍/면/동 레벨 이상 (예시) -->
+                    dc.dong_name AS region_name,
+                    AVG(hi.latitude) AS latitude,
+                    AVG(hi.longitude) AS longitude,
+                    COUNT(hd.no) AS deal_count
+                </otherwise>
+            </choose>
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="searchWhereClause"/>
+        GROUP BY
+        <choose>
+            <when test="zoomLevel != null and zoomLevel &lt;= 7">
+                dc.sido_name
+            </when>
+            <when test="zoomLevel != null and zoomLevel &lt;= 10">
+                dc.gugun_name
+            </when>
+            <otherwise>
+                dc.dong_name
+            </otherwise>
+        </choose>
+        HAVING COUNT(hd.no) > 0
+    </select>
+
 
     <select id="getSidoNames" resultType="String">
         SELECT DISTINCT sido_name FROM dongcodes WHERE sido_name IS NOT NULL
@@ -110,6 +222,58 @@
             houseinfos hi ON hd.apt_seq = hi.apt_seq
         WHERE
             hd.no = #{id}
+    </select>
+
+    <sql id="getApartmentDealsWhereClause">
+        <where>
+            hi.apt_seq = #{aptSeq}
+        </where>
+    </sql>
+
+    <select id="searchHouseDealsByApartmentSeq" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultMap="houseDealResponseMap">
+        SELECT
+            hd.no,
+            hi.apt_seq,
+            hd.apt_dong,
+            hd.floor,
+            hd.deal_year,
+            hd.deal_month,
+            hd.deal_day,
+            hd.exclu_use_ar,
+            hd.deal_amount,
+            hi.apt_nm,
+            hi.jibun,
+            hi.road_nm,
+            hi.build_year,
+            hi.latitude,
+            hi.longitude
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="getApartmentDealsWhereClause"/>
+        ORDER BY hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
+        LIMIT #{size} OFFSET #{page}
+    </select>
+
+    <select id="countHouseDealsByApartmentSeq" parameterType="com.ssafy.zipcheck.deals.dto.MapSearchRequest" resultType="Long">
+        SELECT
+            COUNT(hd.no)
+        FROM houseinfos hi
+                 JOIN dongcodes dc
+                      ON dc.sgg_prefix = hi.sgg_cd
+                          AND dc.dong_name = hi.umd_nm
+                 JOIN housedeals hd USE INDEX (idx_hd_apt_date)
+                      ON hd.apt_seq = hi.apt_seq
+        <include refid="getApartmentDealsWhereClause"/>
+    </select>
+
+    <select id="findDealIdsByAptSeq" parameterType="String" resultType="Long">
+        SELECT hd.no
+        FROM housedeals hd
+        WHERE hd.apt_seq = #{aptSeq}
     </select>
 
 </mapper>

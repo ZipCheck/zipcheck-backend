@@ -7,21 +7,30 @@ import java.time.LocalDateTime;
 
 @Getter
 public class BoardListDto {
-    private final int boardId;
-    private final String title;
-    private final int hit;
-    private final LocalDateTime createdAt;
-    private final String nickname;
-    private final int likeCount;
-    private final boolean isLiked;
+
+    private int boardId;
+    private String title;
+    private String category;
+    private int hit;
+    private int likeCount;
+    private int commentCount;
+
+    private String nickname;
+    private String profileImageUrl;
+
+    private boolean isLiked;
+    private LocalDateTime createdAt;
 
     public BoardListDto(Boards board) {
         this.boardId = board.getBoardId();
         this.title = board.getTitle();
+        this.category = board.getCategory();
         this.hit = board.getHit();
-        this.createdAt = board.getCreatedAt();
-        this.nickname = board.getNickname();
         this.likeCount = board.getLikeCount();
+        this.commentCount = board.getCommentCount();
+        this.nickname = board.getNickname();
+        this.profileImageUrl = board.getProfileImageUrl();
         this.isLiked = board.isLiked();
+        this.createdAt = board.getCreatedAt();
     }
 }

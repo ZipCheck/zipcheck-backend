@@ -1,5 +1,6 @@
 package com.ssafy.zipcheck.auth.service;
 
+import com.ssafy.zipcheck.auth.domain.Role;
 import com.ssafy.zipcheck.auth.dto.SignupRequest;
 import com.ssafy.zipcheck.auth.mapper.AuthMapper;
 import com.ssafy.zipcheck.auth.util.EmailAuthStorage;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -31,23 +33,34 @@ public class AuthServiceImpl implements AuthService {
         if (authMapper.existsByNickname(request.getNickname()) > 0)
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
 
-        request.setPassword(encoder.encode(request.getPassword()));
-        String role = "ROLE_USER";
+        String encodedPassword = encoder.encode(request.getPassword());
 
-        authMapper.insertUser(request, role);
+        // 기본 프로필 이미지 URL
+        String defaultProfileImageUrl =
+                "https://cdn.zipcheck.com/profile/default.png";
+
+        authMapper.insertUser(
+                request.getEmail(),
+                encodedPassword,
+                request.getNickname(),
+                defaultProfileImageUrl,
+                Role.USER
+        );
     }
+
+
 
     @Override
     public User login(String email, String rawPassword) {
         User user = authMapper.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
-        if (!encoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
-        }
-
         if (user.getStatus() == 0) {
             throw new IllegalArgumentException("비활성화된 계정입니다.");
+        }
+
+        if (!encoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         return user;

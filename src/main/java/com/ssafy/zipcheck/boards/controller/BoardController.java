@@ -28,77 +28,73 @@ public class BoardController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody BoardCreateDto createDto
     ) {
-        try {
-            if (userDetails == null) {
-                log.warn("[POST /boards] 인증 정보 없음");
-                return ResponseEntity.status(401)
-                        .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
-            }
-
-            int userId = userDetails.getUser().getUserId();
-            createDto.setUserId(userId);
-
-            boardService.registerBoard(createDto);
-            return ResponseEntity.status(201)
-                    .body(ApiResponse.ok("게시글 등록 완료"));
-
-        } catch (Exception e) {
-            log.error("[POST /boards] 서버 오류: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("게시글 등록 중 문제가 발생했습니다."));
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
         }
+
+        int userId = userDetails.getUser().getUserId();
+        createDto.setUserId(userId);
+        boardService.registerBoard(createDto);
+
+        return ResponseEntity.status(201)
+                .body(ApiResponse.ok("게시글 등록 완료"));
     }
 
     // ============================================================
-    // 게시글 목록 조회
+    // 게시글 전체 목록
     // ============================================================
     @GetMapping
     public ResponseEntity<ApiResponse<?>> getAllBoards(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "latest") String order
     ) {
-        try {
-            Integer userId = (userDetails != null)
-                    ? userDetails.getUser().getUserId()
-                    : null;
+        Integer userId = (userDetails != null)
+                ? userDetails.getUser().getUserId()
+                : null;
 
-            List<BoardListDto> list = boardService.getAllBoards(userId, order);
-            return ResponseEntity.ok(ApiResponse.ok(list));
-
-        } catch (Exception e) {
-            log.error("[GET /boards] 서버 오류: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("게시글 조회 중 문제가 발생했습니다."));
-        }
+        return ResponseEntity.ok(
+                ApiResponse.ok(boardService.getAllBoards(userId, order))
+        );
     }
 
     // ============================================================
-    // 게시글 상세 조회
+    // 게시글 상세
     // ============================================================
     @GetMapping("/{boardId}")
     public ResponseEntity<ApiResponse<?>> getBoard(
             @PathVariable int boardId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            Integer userId = (userDetails != null)
-                    ? userDetails.getUser().getUserId()
-                    : null;
+        Integer userId = (userDetails != null)
+                ? userDetails.getUser().getUserId()
+                : null;
 
-            BoardDetailDto dto = boardService.getBoardById(boardId, userId);
-
-            if (dto == null) {
-                return ResponseEntity.status(404)
-                        .body(ApiResponse.notFound("존재하지 않는 게시글입니다."));
-            }
-
-            return ResponseEntity.ok(ApiResponse.ok(dto));
-
-        } catch (Exception e) {
-            log.error("[GET /boards/{}] 서버 오류: {}", boardId, e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("게시글 조회 중 문제가 발생했습니다."));
+        BoardDetailDto dto = boardService.getBoardById(boardId, userId);
+        if (dto == null) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.notFound("존재하지 않는 게시글입니다."));
         }
+
+        return ResponseEntity.ok(ApiResponse.ok(dto));
+    }
+
+    // ============================================================
+    // 내가 쓴 게시글 조회
+    // ============================================================
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<?>> getMyBoards(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.unauthorized("로그인이 필요합니다."));
+        }
+
+        int userId = userDetails.getUser().getUserId();
+        return ResponseEntity.ok(
+                ApiResponse.ok(boardService.getMyBoards(userId))
+        );
     }
 
     // ============================================================
@@ -110,28 +106,18 @@ public class BoardController {
             @RequestBody BoardUpdateDto updateDto,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            if (userDetails == null) {
-                log.warn("[PATCH /boards/{}] 인증 정보 없음", boardId);
-                return ResponseEntity.status(401)
-                        .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
-            }
-
-            int userId = userDetails.getUser().getUserId();
-            boardService.updateBoard(boardId, updateDto, userId);
-
-            return ResponseEntity.ok(ApiResponse.ok("게시글 수정 완료"));
-
-        } catch (IllegalArgumentException e) {
-            log.warn("[PATCH /boards/{}] 잘못된 요청: {}", boardId, e.getMessage());
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.invalid(e.getMessage()));
-
-        } catch (Exception e) {
-            log.error("[PATCH /boards/{}] 서버 오류: {}", boardId, e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("게시글 수정 중 문제가 발생했습니다."));
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
         }
+
+        boardService.updateBoard(
+                boardId,
+                updateDto,
+                userDetails.getUser().getUserId()
+        );
+
+        return ResponseEntity.ok(ApiResponse.ok("게시글 수정 완료"));
     }
 
     // ============================================================
@@ -142,56 +128,37 @@ public class BoardController {
             @PathVariable int boardId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            if (userDetails == null) {
-                log.warn("[DELETE /boards/{}] 인증 정보 없음", boardId);
-                return ResponseEntity.status(401)
-                        .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
-            }
-
-            int userId = userDetails.getUser().getUserId();
-            boardService.deleteBoard(boardId, userId);
-
-            return ResponseEntity.ok(ApiResponse.ok("삭제 완료"));
-
-        } catch (IllegalArgumentException e) {
-            log.warn("[DELETE /boards/{}] 잘못된 요청: {}", boardId, e.getMessage());
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.invalid(e.getMessage()));
-
-        } catch (Exception e) {
-            log.error("[DELETE /boards/{}] 서버 오류: {}", boardId, e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("게시글 삭제 중 문제가 발생했습니다."));
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.unauthorized("인증 정보가 없습니다."));
         }
+
+        boardService.deleteBoard(
+                boardId,
+                userDetails.getUser().getUserId()
+        );
+
+        return ResponseEntity.ok(ApiResponse.ok("삭제 완료"));
     }
 
     // ============================================================
-    // 좋아요 Toggle
+    // 좋아요 토글
     // ============================================================
     @PostMapping("/{boardId}/like")
     public ResponseEntity<ApiResponse<?>> toggleLike(
             @PathVariable int boardId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            if (userDetails == null) {
-                log.warn("[POST /boards/{}/like] 인증 정보 없음", boardId);
-                return ResponseEntity.status(401)
-                        .body(ApiResponse.unauthorized("로그인이 필요합니다."));
-            }
-
-            int userId = userDetails.getUser().getUserId();
-            boolean nowLiked = boardService.toggleLike(boardId, userId);
-
-            // 메시지는 고정 "OK", data에 nowLiked만 담기
-            return ResponseEntity.ok(ApiResponse.ok(nowLiked));
-
-        } catch (Exception e) {
-            log.error("[POST /boards/{}/like] 서버 오류: {}", boardId, e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.internalError("좋아요 처리 중 문제가 발생했습니다."));
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.unauthorized("로그인이 필요합니다."));
         }
-    }
 
+        boolean nowLiked = boardService.toggleLike(
+                boardId,
+                userDetails.getUser().getUserId()
+        );
+
+        return ResponseEntity.ok(ApiResponse.ok(nowLiked));
+    }
 }

@@ -1,17 +1,28 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ssafy.zipcheck.comments.mapper.CommentMapper">
 
-    <!-- 댓글 조회 (닉네임 포함) -->
-    <select id="findByBoardId" resultType="com.ssafy.zipcheck.comments.dto.CommentResponse">
+    <!-- ========================================================= -->
+    <!-- 댓글 조회 -->
+    <!-- ========================================================= -->
+    <select id="findByBoardId"
+            resultType="com.ssafy.zipcheck.comments.dto.CommentResponse">
         SELECT
             c.comment_id,
             c.content,
-            u.nickname,
+
+            CASE
+                WHEN u.status != 1 THEN '탈퇴한 사용자'
+                ELSE u.nickname
+                END AS nickname,
+
+            u.profile_image_url AS profileImageUrl,
+
             DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') AS createdAt
+
         FROM comments c
                  JOIN users u ON c.user_id = u.user_id
         WHERE c.board_id = #{boardId}
@@ -19,20 +30,26 @@
         ORDER BY c.created_at ASC
     </select>
 
+    <!-- ========================================================= -->
     <!-- 댓글 등록 -->
+    <!-- ========================================================= -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="commentId">
         INSERT INTO comments (content, created_at, board_id, user_id, visible)
         VALUES (#{content}, NOW(), #{boardId}, #{userId}, 1)
     </insert>
 
+    <!-- ========================================================= -->
     <!-- 댓글 작성자 조회 -->
+    <!-- ========================================================= -->
     <select id="findOwner" resultType="int">
         SELECT user_id
         FROM comments
         WHERE comment_id = #{commentId}
     </select>
 
-    <!-- soft delete -->
+    <!-- ========================================================= -->
+    <!-- 댓글 삭제 (soft delete) -->
+    <!-- ========================================================= -->
     <update id="delete">
         UPDATE comments
         SET visible = 0

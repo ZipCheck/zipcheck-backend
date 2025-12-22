@@ -2,13 +2,13 @@ package com.ssafy.zipcheck.auth.config;
 
 import com.ssafy.zipcheck.auth.jwt.JwtFilter;
 import com.ssafy.zipcheck.auth.jwt.JwtProperties;
-import com.ssafy.zipcheck.auth.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +22,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
@@ -36,18 +37,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.cors((cors) -> cors.configurationSource(new CorsConfigurationSource() {
+        http.cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                configuration.setAllowedOrigins(
+                        Collections.singletonList("http://localhost:3000")
+                );
                 configuration.setAllowedMethods(Collections.singletonList("*"));
-                configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
+                configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L);
-
-                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                configuration.setExposedHeaders(
+                        Collections.singletonList("Authorization")
+                );
 
                 return configuration;
             }
@@ -58,25 +62,37 @@ public class SecurityConfig {
         http.httpBasic(basic -> basic.disable());
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET,
-                        "/boards",
-                        "/boards/**"
-                ).permitAll()   // 조회만 open
 
-                .requestMatchers(HttpMethod.POST,
-                        "/boards",
-                        "/boards/*/like"
-                ).authenticated()  // 등록 + 좋아요
+                // CORS preflight 허용 (중요)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                .requestMatchers(HttpMethod.PUT,
-                        "/boards/**"
-                ).authenticated() // 수정
+                // 프로필 이미지 조회 (공개)
+                .requestMatchers(HttpMethod.GET, "/users/*/profile-image")
+                .permitAll()
 
-                .requestMatchers(HttpMethod.DELETE,
-                        "/boards/**"
-                ).authenticated() // 삭제
+                // 파일 업로드
+                .requestMatchers(HttpMethod.POST, "/files/**")
+                .hasAnyRole("USER", "ADMIN")
 
-                // auth 관련은 모두 허용
+                // 공지사항
+                .requestMatchers(HttpMethod.GET, "/notices", "/notices/**")
+                .permitAll()
+
+                // 게시글
+                .requestMatchers(HttpMethod.GET, "/boards", "/boards/**")
+                .permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/boards", "/boards/*/like")
+                .hasAnyRole("USER", "ADMIN")
+
+                // 댓글
+                .requestMatchers(HttpMethod.GET, "/comments/**")
+                .permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/comments")
+                .hasAnyRole("USER", "ADMIN")
+
+                // 인증
                 .requestMatchers(
                         "/auth/signup",
                         "/auth/login",
@@ -84,6 +100,17 @@ public class SecurityConfig {
                         "/auth/password/reset",
                         "/auth/password/reset-confirm"
                 ).permitAll()
+
+                // =========================
+                // AI 관련 (테스트 편의를 위해 임시로 permitAll)
+                // 배포 전에는 hasRole("ADMIN") 등으로 변경해야 함
+                // =========================
+                .requestMatchers(HttpMethod.POST, "/api/ai/index-reviews").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/ai/deals/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/ai/apartments/**").permitAll() // 추가된 설정
+                // 마이페이지
+                .requestMatchers("/users/**")
+                .hasAnyRole("USER", "ADMIN")
 
                 .anyRequest().authenticated()
         );

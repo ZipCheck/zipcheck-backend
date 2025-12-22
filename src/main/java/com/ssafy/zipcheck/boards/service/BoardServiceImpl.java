@@ -5,7 +5,6 @@ import com.ssafy.zipcheck.boards.mapper.BoardMapper;
 import com.ssafy.zipcheck.boards.mapper.LikeMapper;
 import com.ssafy.zipcheck.boards.vo.Boards;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BoardServiceImpl implements BoardService {
 
     private final BoardMapper boardMapper;
@@ -28,8 +26,10 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public List<BoardListDto> getAllBoards(Integer userId, String order) {
-        List<Boards> list = boardMapper.findAll(userId, order);
-        return list.stream().map(BoardListDto::new).collect(Collectors.toList());
+        return boardMapper.findAll(userId, order)
+                .stream()
+                .map(BoardListDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -53,6 +53,7 @@ public class BoardServiceImpl implements BoardService {
             throw new IllegalArgumentException("본인이 작성한 게시글만 수정할 수 있습니다.");
 
         board.setTitle(dto.getTitle());
+        board.setCategory(dto.getCategory());
         board.setContent(dto.getContent());
 
         boardMapper.update(board);
@@ -71,21 +72,24 @@ public class BoardServiceImpl implements BoardService {
         boardMapper.delete(boardId);
     }
 
-    // ============================================================
-    // 좋아요 Toggle
-    // ============================================================
     @Override
     @Transactional
     public boolean toggleLike(int boardId, int userId) {
-
-        boolean alreadyLiked = likeMapper.existsLike(boardId, userId) > 0;
-
-        if (alreadyLiked) {
+        boolean exists = likeMapper.existsLike(boardId, userId) > 0;
+        if (exists) {
             likeMapper.deleteLike(boardId, userId);
             return false;
         } else {
             likeMapper.insertLike(boardId, userId);
             return true;
         }
+    }
+
+    @Override
+    public List<BoardListDto> getMyBoards(int userId) {
+        return boardMapper.findByUserId(userId)
+                .stream()
+                .map(BoardListDto::new)
+                .collect(Collectors.toList());
     }
 }
