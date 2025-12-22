@@ -10,9 +10,26 @@ import java.util.List;
 
 @Mapper
 public interface InterestMapper {
+
     void addInterest(Interest interest);
-    void deleteInterest(@Param("interestId") Integer interestId, @Param("userId") Integer userId);
-    List<InterestResponse> findInterestsByUser(InterestQueryRequest request);
-    int countInterestsByUser(InterestQueryRequest request);
-    Interest findInterestByUserIdAndDealNo(@Param("userId") Integer userId, @Param("dealNo") Integer dealNo);
+
+    void deleteByUserAndDeal(
+            @Param("userId") Integer userId,
+            @Param("dealNo") Integer dealNo
+    );
+
+    Interest findByUserIdAndDealNo(
+            @Param("userId") Integer userId,
+            @Param("dealNo") Integer dealNo
+    );
+
+    List<InterestResponse> findInterestsByUser(
+            @Param("userId") Integer userId,
+            @Param("request") InterestQueryRequest request
+    );
+
+    int countInterestsByUser(
+            @Param("userId") Integer userId,
+            @Param("request") InterestQueryRequest request
+    );
 }

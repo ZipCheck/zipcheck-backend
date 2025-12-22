@@ -1,105 +1,178 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ssafy.zipcheck.interests.mapper.InterestMapper">
 
-    <resultMap id="InterestResponseMap" type="com.ssafy.zipcheck.interests.dto.InterestResponse">
-        <id column="interest_id" property="interestId"/>
-        <result column="apt_seq" property="aptSeq"/>
-        <result column="apt_nm" property="aptName"/>
-        <result column="jibun" property="jibun"/>
-        <result column="road_nm" property="roadNm"/>
-        <result column="build_year" property="buildYear"/>
-        <result column="latitude" property="latitude"/>
-        <result column="longitude" property="longitude"/>
-        <result column="no" property="no"/>
-        <result column="apt_dong" property="aptDong"/>
-        <result column="floor" property="floor"/>
-        <result column="deal_year" property="dealYear"/>
-        <result column="deal_month" property="dealMonth"/>
-        <result column="deal_day" property="dealDay"/>
-        <result column="exclu_use_ar" property="excluUseAr"/>
-        <result column="deal_amount" property="dealAmount"/>
+    <!-- ========================================================= -->
+    <!-- ResultMap -->
+    <!-- ========================================================= -->
+    <resultMap id="InterestResponseMap"
+               type="com.ssafy.zipcheck.interests.dto.InterestResponse">
+
+        <!-- interest -->
+        <id property="interestId" column="interest_id"/>
+        <result property="dealNo" column="deal_no"/>
+        <result property="createdAt" column="created_at"/>
+
+        <!-- houseinfos -->
+        <result property="aptSeq" column="apt_seq"/>
+        <result property="aptName" column="apt_nm"/>
+        <result property="jibun" column="jibun"/>
+        <result property="roadNm" column="road_nm"/>
+        <result property="buildYear" column="build_year"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+
+        <!-- housedeals -->
+        <result property="aptDong" column="apt_dong"/>
+        <result property="floor" column="floor"/>
+        <result property="dealYear" column="deal_year"/>
+        <result property="dealMonth" column="deal_month"/>
+        <result property="dealDay" column="deal_day"/>
+        <result property="excluUseAr" column="exclu_use_ar"/>
+        <result property="dealAmount" column="deal_amount"/>
+
+        <!-- UI 확장 -->
+        <result property="hasSticker" column="has_sticker"/>
     </resultMap>
 
-    <insert id="addInterest" parameterType="com.ssafy.zipcheck.interests.vo.Interest">
+    <!-- ========================================================= -->
+    <!-- Insert -->
+    <!-- ========================================================= -->
+    <insert id="addInterest"
+            parameterType="com.ssafy.zipcheck.interests.vo.Interest">
         INSERT INTO interests (user_id, deal_no, created_at)
         VALUES (#{userId}, #{dealNo}, NOW())
     </insert>
 
-    <delete id="deleteInterest">
+    <!-- ========================================================= -->
+    <!-- Delete -->
+    <!-- ========================================================= -->
+    <delete id="deleteByUserAndDeal">
         DELETE FROM interests
-        WHERE interest_id = #{interestId} AND user_id = #{userId}
+        WHERE user_id = #{userId}
+          AND deal_no = #{dealNo}
     </delete>
 
-    <select id="findInterestByUserIdAndDealNo" resultType="com.ssafy.zipcheck.interests.vo.Interest">
-        SELECT interest_id, user_id, deal_no, created_at
+    <!-- ========================================================= -->
+    <!-- Exists Check -->
+    <!-- ========================================================= -->
+    <select id="findByUserIdAndDealNo"
+            resultType="com.ssafy.zipcheck.interests.vo.Interest">
+        SELECT
+            interest_id,
+            user_id,
+            deal_no,
+            created_at
         FROM interests
-        WHERE user_id = #{userId} AND deal_no = #{dealNo}
+        WHERE user_id = #{userId}
+          AND deal_no = #{dealNo}
     </select>
 
-    <sql id="interestSearchWhereClause">
-        <where>
-            i.user_id = #{userId}
-            <if test="sidoName != null and !sidoName.isEmpty()">
-                AND dc.sido_name = #{sidoName}
-            </if>
-            <if test="gugunName != null and !gugunName.isEmpty()">
-                AND dc.gugun_name = #{gugunName}
-            </if>
-            <if test="dongName != null and !dongName.isEmpty()">
-                AND dc.dong_name = #{dongName}
-            </if>
-            <if test="minArea != null">
-                AND hd.exclu_use_ar &gt;= #{minArea}
-            </if>
-            <if test="maxArea != null">
-                AND hd.exclu_use_ar &lt;= #{maxArea}
-            </if>
-            <if test="minPrice != null">
-                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &gt;= #{minPrice}
-            </if>
-            <if test="maxPrice != null">
-                AND CAST(REPLACE(hd.deal_amount, ',', '') AS DECIMAL) &lt;= #{maxPrice}
-            </if>
-        </where>
+    <!-- ========================================================= -->
+    <!-- Dynamic WHERE -->
+    <!-- ========================================================= -->
+    <sql id="interestFilter">
+        <if test="request.sidoName != null and request.sidoName != ''">
+            AND dc.sido_name = #{request.sidoName}
+        </if>
+        <if test="request.gugunName != null and request.gugunName != ''">
+            AND dc.gugun_name = #{request.gugunName}
+        </if>
+        <if test="request.dongName != null and request.dongName != ''">
+            AND dc.dong_name = #{request.dongName}
+        </if>
+
+        <if test="request.minArea != null">
+            AND hd.exclu_use_ar &gt;= #{request.minArea}
+        </if>
+        <if test="request.maxArea != null">
+            AND hd.exclu_use_ar &lt;= #{request.maxArea}
+        </if>
+
+        <if test="request.minPrice != null">
+            AND hd.deal_amount_num &gt;= #{request.minPrice}
+        </if>
+        <if test="request.maxPrice != null">
+            AND hd.deal_amount_num &lt;= #{request.maxPrice}
+        </if>
     </sql>
 
-    <select id="findInterestsByUser" parameterType="com.ssafy.zipcheck.interests.dto.InterestQueryRequest" resultMap="InterestResponseMap">
+    <!-- ========================================================= -->
+    <!-- Select : Interest List -->
+    <!-- ========================================================= -->
+    <select id="findInterestsByUser"
+            resultMap="InterestResponseMap">
+
         SELECT
-            i.interest_id,
-            hi.apt_seq,
-            hi.apt_nm,
-            hi.jibun,
-            hi.road_nm,
-            hi.build_year,
-            hi.latitude,
-            hi.longitude,
-            hd.no,
-            hd.apt_dong,
-            hd.floor,
-            hd.deal_year,
-            hd.deal_month,
-            hd.deal_day,
-            hd.exclu_use_ar,
-            hd.deal_amount
+        i.interest_id,
+        i.deal_no,
+        i.created_at,
+
+        hi.apt_seq,
+        hi.apt_nm,
+        hi.jibun,
+        hi.road_nm,
+        hi.build_year,
+        hi.latitude,
+        hi.longitude,
+
+        hd.apt_dong,
+        hd.floor,
+        hd.deal_year,
+        hd.deal_month,
+        hd.deal_day,
+        hd.exclu_use_ar,
+        hd.deal_amount,
+
+        CASE
+        WHEN s.sticker_id IS NULL THEN FALSE
+        ELSE TRUE
+        END AS has_sticker
+
         FROM interests i
-        JOIN housedeals hd ON i.deal_no = hd.no
-        JOIN houseinfos hi ON hd.apt_seq = hi.apt_seq
-        JOIN dongcodes dc ON dc.sgg_prefix = hi.sgg_cd AND dc.dong_name = hi.umd_nm
-        <include refid="interestSearchWhereClause"/>
-        ORDER BY i.interest_id ASC, hd.deal_year DESC, hd.deal_month DESC, hd.deal_day DESC
-        LIMIT #{size} OFFSET #{offset}
+        JOIN housedeals hd
+        ON i.deal_no = hd.no
+        JOIN houseinfos hi
+        ON hd.apt_seq = hi.apt_seq
+        JOIN dongcodes dc
+        ON dc.sgg_prefix = hi.sgg_cd
+        AND dc.dong_name = hi.umd_nm
+        LEFT JOIN sticker s
+        ON s.deal_id = hd.no
+        AND s.user_id = i.user_id
+
+        WHERE i.user_id = #{userId}
+
+        <include refid="interestFilter"/>
+
+        ORDER BY i.created_at DESC
+        LIMIT #{request.size}
+        OFFSET #{request.offset}
     </select>
 
-    <select id="countInterestsByUser" parameterType="com.ssafy.zipcheck.interests.dto.InterestQueryRequest" resultType="int">
+    <!-- ========================================================= -->
+    <!-- Select : Count -->
+    <!-- ========================================================= -->
+    <select id="countInterestsByUser"
+            resultType="int">
+
         SELECT COUNT(i.interest_id)
+
         FROM interests i
-        JOIN housedeals hd ON i.deal_no = hd.no
-        JOIN houseinfos hi ON hd.apt_seq = hi.apt_seq
-        JOIN dongcodes dc ON dc.sgg_prefix = hi.sgg_cd AND dc.dong_name = hi.umd_nm
-        <include refid="interestSearchWhereClause"/>
+        JOIN housedeals hd
+        ON i.deal_no = hd.no
+        JOIN houseinfos hi
+        ON hd.apt_seq = hi.apt_seq
+        JOIN dongcodes dc
+        ON dc.sgg_prefix = hi.sgg_cd
+        AND dc.dong_name = hi.umd_nm
+
+        WHERE i.user_id = #{userId}
+
+        <include refid="interestFilter"/>
     </select>
 
 </mapper>

@@ -1,15 +1,31 @@
 package com.ssafy.zipcheck.interests.service;
 
-import com.ssafy.zipcheck.interests.dto.InterestCreateRequest;
+import com.ssafy.zipcheck.interests.dto.InterestListResponse;
 import com.ssafy.zipcheck.interests.dto.InterestQueryRequest;
-import com.ssafy.zipcheck.interests.dto.InterestResponse;
-import com.ssafy.zipcheck.common.response.ApiResponse; // Assuming ApiResponse is in common
-
-import java.util.List;
-import java.util.Map;
 
 public interface InterestService {
-    Map<String, Object> getInterests(Integer userId, InterestQueryRequest request);
-    void createInterest(Integer userId, InterestCreateRequest request);
-    void deleteInterest(Integer userId, Integer interestId);
+
+    /**
+     * 관심 매물 목록 조회
+     */
+    InterestListResponse getInterests(
+            Integer userId,
+            InterestQueryRequest request
+    );
+
+    /**
+     * 관심 매물 등록
+     */
+    void createInterest(
+            Integer userId,
+            Integer dealNo
+    );
+
+    /**
+     * 관심 매물 삭제
+     */
+    void deleteInterest(
+            Integer userId,
+            Integer dealNo
+    );
 }
