@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Sticker {
     private Long stickerId;
     private Integer userId;
-    private Integer dealId;
+    private String aptId; // Changed from dealId (Integer)
     private Integer stickerTypeId;
     private String description;
     private LocalDateTime createdAt;

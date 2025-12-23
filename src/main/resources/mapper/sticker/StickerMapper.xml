@@ -5,25 +5,24 @@
 <mapper namespace="com.ssafy.zipcheck.sticker.mapper.StickerMapper">
 
     <insert id="insertSticker" parameterType="com.ssafy.zipcheck.sticker.vo.Sticker">
-        INSERT INTO sticker (user_id, deal_id, sticker_type_id, description)
-        VALUES (#{userId}, #{dealId}, #{stickerTypeId}, #{description})
+        INSERT INTO sticker (user_id, apt_id, sticker_type_id, description)
+        VALUES (#{userId}, #{aptId}, #{stickerTypeId}, #{description})
     </insert>
 
     <select id="findStickerById" parameterType="long" resultType="com.ssafy.zipcheck.sticker.vo.Sticker">
-        SELECT sticker_id, user_id, deal_id, sticker_type_id, description, created_at
+        SELECT sticker_id, user_id, apt_id, sticker_type_id, description, created_at
         FROM sticker
         WHERE sticker_id = #{stickerId}
     </select>
 
-    <select id="findStickersByDealId" parameterType="long" resultType="com.ssafy.zipcheck.sticker.dto.StickerResponse">
+    <select id="findStickersByAptId" parameterType="string" resultType="com.ssafy.zipcheck.sticker.dto.StickerResponse">
         SELECT
             s.sticker_id AS stickerId,
             s.user_id AS userId,
             u.nickname AS userNickname,
-            s.deal_id AS dealId,
+            s.apt_id AS aptId,
             s.sticker_type_id AS stickerTypeId,
             st.name AS stickerTypeName,
-            st.icon_url AS stickerIconUrl,
             s.description,
             s.created_at AS createdAt
         FROM
@@ -33,7 +32,7 @@
         JOIN
             sticker_type st ON s.sticker_type_id = st.sticker_type_id
         WHERE
-            s.deal_id = #{dealId}
+            s.apt_id = #{aptId}
         ORDER BY
             s.created_at DESC
     </select>
@@ -46,6 +45,31 @@
         SELECT user_id
         FROM sticker
         WHERE sticker_id = #{stickerId}
+    </select>
+
+    <select id="findStickerTypeIdByName" parameterType="string" resultType="java.lang.Integer">
+        SELECT sticker_type_id
+        FROM sticker_type
+        WHERE name = #{name}
+    </select>
+
+    <select id="findStickerEmotionsByBounds"
+            parameterType="com.ssafy.zipcheck.sticker.dto.StickerMapQueryRequest"
+            resultType="com.ssafy.zipcheck.sticker.dto.StickerMapRow">
+        SELECT
+            s.apt_id AS aptId,
+            hi.latitude AS latitude,
+            hi.longitude AS longitude,
+            s.sticker_type_id AS stickerTypeId,
+            st.emoji AS emoji,
+            COUNT(*) AS count
+        FROM sticker s
+                 JOIN houseinfos hi ON s.apt_id = hi.apt_seq
+                 JOIN sticker_type st ON s.sticker_type_id = st.sticker_type_id
+        WHERE hi.latitude BETWEEN #{minLatitude} AND #{maxLatitude}
+          AND hi.longitude BETWEEN #{minLongitude} AND #{maxLongitude}
+        GROUP BY s.apt_id, hi.latitude, hi.longitude, s.sticker_type_id, st.emoji
+        ORDER BY s.apt_id, s.sticker_type_id
     </select>
 
 </mapper>

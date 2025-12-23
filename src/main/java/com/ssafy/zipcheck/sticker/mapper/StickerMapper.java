@@ -1,5 +1,7 @@
 package com.ssafy.zipcheck.sticker.mapper;
 
+import com.ssafy.zipcheck.sticker.dto.StickerMapQueryRequest;
+import com.ssafy.zipcheck.sticker.dto.StickerMapRow;
 import com.ssafy.zipcheck.sticker.dto.StickerResponse;
 import com.ssafy.zipcheck.sticker.vo.Sticker;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,9 +16,13 @@ public interface StickerMapper {
 
     Optional<Sticker> findStickerById(long stickerId);
 
-    List<StickerResponse> findStickersByDealId(long dealId);
+    List<StickerResponse> findStickersByAptId(String aptId);
 
     void deleteSticker(long stickerId);
 
     Integer findUserIdByStickerId(long stickerId);
+
+    Integer findStickerTypeIdByName(String name);
+
+    List<StickerMapRow> findStickerEmotionsByBounds(StickerMapQueryRequest request);
 }

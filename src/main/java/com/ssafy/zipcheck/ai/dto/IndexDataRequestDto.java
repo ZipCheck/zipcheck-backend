@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IndexDataRequestDto {
-    @JsonProperty("deal_id")
-    private int dealId;
+    @JsonProperty("apt_id")
+    private String aptId; // Changed from dealId (int)
 
     @JsonProperty("stickers")
     private List<StickerDataDto> stickers;
