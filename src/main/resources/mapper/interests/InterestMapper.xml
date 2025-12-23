@@ -125,12 +125,7 @@
         hd.deal_month,
         hd.deal_day,
         hd.exclu_use_ar,
-        hd.deal_amount,
-
-        CASE
-        WHEN s.sticker_id IS NULL THEN FALSE
-        ELSE TRUE
-        END AS has_sticker
+        hd.deal_amount
 
         FROM interests i
         JOIN housedeals hd
@@ -140,11 +135,16 @@
         JOIN dongcodes dc
         ON dc.sgg_prefix = hi.sgg_cd
         AND dc.dong_name = hi.umd_nm
-        LEFT JOIN sticker s
-        ON s.deal_id = hd.no
-        AND s.user_id = i.user_id
 
         WHERE i.user_id = #{userId}
+
+        -- 스티커 등록된 매물 제외
+        AND NOT EXISTS (
+        SELECT 1
+        FROM sticker s
+        WHERE s.apt_id = hd.apt_seq
+        AND s.user_id = i.user_id
+        )
 
         <include refid="interestFilter"/>
 
