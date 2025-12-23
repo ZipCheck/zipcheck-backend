@@ -4,5 +4,5 @@ import com.ssafy.zipcheck.ai.dto.ChatbotResponseDto;
 
 public interface AIService {
     ChatbotResponseDto getApartmentReport(String aptSeq); // dealId 대신 aptSeq를 받음
-    void requestIndexingWithData(int dealId);
+    void requestIndexingWithData(String aptId); // Changed parameter from int dealId to String aptId
 }

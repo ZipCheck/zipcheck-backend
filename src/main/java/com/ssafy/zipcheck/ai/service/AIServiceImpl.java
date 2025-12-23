@@ -28,7 +28,7 @@ public class AIServiceImpl implements AIService {
         log.info("Requesting AI report for aptSeq: {}", aptSeq);
 
         // 1. aptSeq에 해당하는 모든 스티커 데이터 조회
-        List<StickerResponse> stickers = stickerService.getStickersByAptSeq(aptSeq);
+        List<StickerResponse> stickers = stickerService.getStickersByAptId(aptSeq);
 
         // 2. DTO로 변환
         List<StickerDataDto> stickerDataDtos = stickers.stream()
@@ -47,6 +47,8 @@ public class AIServiceImpl implements AIService {
             "stickers", stickerDataDtos
         );
 
+        //log.debug("dto is ... {}", stickerDataDtos.get(0));
+
         // Python AI 서버의 새로운 엔드포인트 호출 (예: /api/apartments/{apt_seq}/chatbot)
         // 여기서는 임시로 /api/chatbot 으로 보내고 apt_seq를 body에 포함
         return webClient.post()
@@ -60,11 +62,11 @@ public class AIServiceImpl implements AIService {
     }
 
     @Override
-    public void requestIndexingWithData(int dealId) {
-        log.info("Preparing data for indexing for dealId: {}", dealId);
+    public void requestIndexingWithData(String aptId) { // Changed parameter to String aptId
+        log.info("Preparing data for indexing for aptId: {}", aptId); // Log aptId
 
         // 1. StickerService를 통해 스티커 데이터 조회
-        List<StickerResponse> stickers = stickerService.getStickersByDealId(dealId);
+        List<StickerResponse> stickers = stickerService.getStickersByAptId(aptId); // Changed method call
 
         // 2. DTO로 변환
         List<StickerDataDto> stickerDataDtos = stickers.stream()
@@ -75,7 +77,7 @@ public class AIServiceImpl implements AIService {
                 .collect(Collectors.toList());
 
         IndexDataRequestDto requestDto = IndexDataRequestDto.builder()
-                .dealId(dealId)
+                .aptId(aptId) // Changed from dealId to aptId
                 .stickers(stickerDataDtos)
                 .build();
 
@@ -85,8 +87,8 @@ public class AIServiceImpl implements AIService {
                 .body(Mono.just(requestDto), IndexDataRequestDto.class)
                 .retrieve()
                 .bodyToMono(String.class) // 응답 바디를 String으로 받음
-                .doOnSuccess(response -> log.info("Successfully requested indexing for dealId: {}. Response: {}", dealId, response))
-                .doOnError(error -> log.error("Error while requesting indexing for dealId: {}", dealId, error))
+                .doOnSuccess(response -> log.info("Successfully requested indexing for aptId: {}. Response: {}", aptId, response)) // Log aptId
+                .doOnError(error -> log.error("Error while requesting indexing for aptId: {}", aptId, error)) // Log aptId
                 .subscribe(); // 비동기로 요청을 보내고 바로 리턴
     }
 }

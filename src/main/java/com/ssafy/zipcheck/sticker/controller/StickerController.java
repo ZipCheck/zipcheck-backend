@@ -3,6 +3,8 @@ package com.ssafy.zipcheck.sticker.controller;
 import com.ssafy.zipcheck.auth.domain.CustomUserDetails;
 import com.ssafy.zipcheck.common.response.ApiResponse;
 import com.ssafy.zipcheck.sticker.dto.StickerCreateRequest;
+import com.ssafy.zipcheck.sticker.dto.StickerMapQueryRequest;
+import com.ssafy.zipcheck.sticker.dto.StickerMapResponse;
 import com.ssafy.zipcheck.sticker.dto.StickerResponse;
 import com.ssafy.zipcheck.sticker.service.StickerService;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +44,27 @@ public class StickerController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<StickerResponse>>> getStickersByDealId(@RequestParam long dealId) {
+    public ResponseEntity<ApiResponse<List<StickerResponse>>> getStickersByAptId(@RequestParam String aptId) {
         try {
-            List<StickerResponse> stickers = stickerService.getStickersByDealId(dealId);
+            List<StickerResponse> stickers = stickerService.getStickersByAptId(aptId);
             return ResponseEntity.ok(ApiResponse.ok(stickers));
         } catch (Exception e) {
-            log.error("[GET /api/stickers?dealId={}] Error fetching stickers: {}", dealId, e.getMessage(), e);
+            log.error("[GET /api/stickers?aptId={}] Error fetching stickers: {}", aptId, e.getMessage(), e);
             return ResponseEntity.internalServerError().body(ApiResponse.internalError("스티커 조회 중 오류가 발생했습니다."));
+        }
+    }
+
+    @GetMapping("/map")
+    public ResponseEntity<ApiResponse<List<StickerMapResponse>>> getStickerMap(@ModelAttribute StickerMapQueryRequest request) {
+        try {
+            List<StickerMapResponse> responses = stickerService.getStickerEmotionsByBounds(request);
+            return ResponseEntity.ok(ApiResponse.ok(responses));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.invalid(e.getMessage()));
+        } catch (Exception e) {
+            log.error("[GET /api/stickers/map] Error fetching sticker map: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.internalError("스티커 지도 조회 중 오류가 발생했습니다."));
         }
     }
 
