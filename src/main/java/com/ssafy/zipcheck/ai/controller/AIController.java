@@ -33,10 +33,10 @@ public class AIController {
     @PostMapping("/index-reviews")
     public ResponseEntity<ApiResponse<?>> requestIndexing(@RequestBody IndexRequest request) {
         try {
-            aiService.requestIndexingWithData(request.getDealId());
+            aiService.requestIndexingWithData(request.getAptId()); // Changed to getAptId()
             return ResponseEntity.accepted().body(ApiResponse.ok("인덱싱 요청이 성공적으로 접수되었습니다."));
         } catch (Exception e) {
-            log.error("Error during indexing request for dealId: {}", request.getDealId(), e);
+            log.error("Error during indexing request for aptId: {}", request.getAptId(), e); // Changed log message
             return ResponseEntity.internalServerError().body(ApiResponse.internalError("인덱싱 요청 처리 중 오류가 발생했습니다."));
         }
     }
