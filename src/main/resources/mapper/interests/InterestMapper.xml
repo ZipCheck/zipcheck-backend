@@ -138,14 +138,6 @@
 
         WHERE i.user_id = #{userId}
 
-        -- 스티커 등록된 매물 제외
-        AND NOT EXISTS (
-        SELECT 1
-        FROM sticker s
-        WHERE s.apt_id = hd.apt_seq
-        AND s.user_id = i.user_id
-        )
-
         <include refid="interestFilter"/>
 
         ORDER BY i.created_at DESC
@@ -156,8 +148,7 @@
     <!-- ========================================================= -->
     <!-- Select : Count -->
     <!-- ========================================================= -->
-    <select id="countInterestsByUser"
-            resultType="int">
+    <select id="countInterestsByUser" resultType="int">
 
         SELECT COUNT(i.interest_id)
 
@@ -173,6 +164,7 @@
         WHERE i.user_id = #{userId}
 
         <include refid="interestFilter"/>
+
     </select>
 
 </mapper>

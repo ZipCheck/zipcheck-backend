@@ -30,6 +30,9 @@ public class InterestController {
         InterestListResponse response =
                 interestService.getInterests(user.getUserId(), request);
 
+        System.out.println("=======================");
+        System.out.println("response : " + response);
+
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
