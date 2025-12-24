@@ -15,26 +15,24 @@
         WHERE sticker_id = #{stickerId}
     </select>
 
-    <select id="findStickersByAptId" parameterType="string" resultType="com.ssafy.zipcheck.sticker.dto.StickerResponse">
+    <select id="findStickersByAptId"
+            parameterType="string"
+            resultType="com.ssafy.zipcheck.sticker.dto.StickerResponse">
         SELECT
-            s.sticker_id AS stickerId,
-            s.user_id AS userId,
-            u.nickname AS userNickname,
-            s.apt_id AS aptId,
-            s.sticker_type_id AS stickerTypeId,
-            st.name AS stickerTypeName,
+            s.sticker_id        AS stickerId,
+            s.user_id           AS userId,
+            u.nickname          AS userNickname,
+            s.apt_id            AS aptId,
+            s.sticker_type_id   AS stickerTypeId,
+            st.name             AS stickerTypeName,
+            st.emoji            AS stickerIconUrl,
             s.description,
-            s.created_at AS createdAt
-        FROM
-            sticker s
-        JOIN
-            users u ON s.user_id = u.user_id
-        JOIN
-            sticker_type st ON s.sticker_type_id = st.sticker_type_id
-        WHERE
-            s.apt_id = #{aptId}
-        ORDER BY
-            s.created_at DESC
+            s.created_at        AS createdAt
+        FROM sticker s
+                 JOIN users u ON s.user_id = u.user_id
+                 JOIN sticker_type st ON s.sticker_type_id = st.sticker_type_id
+        WHERE s.apt_id = #{aptId}
+        ORDER BY s.created_at DESC
     </select>
 
     <delete id="deleteSticker" parameterType="long">
